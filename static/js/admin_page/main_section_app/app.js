@@ -63,28 +63,28 @@ const main_section_app = Vue.createApp({
             add_booked_place_form: {
                 "booking_request": null,
                 "booking_request_id": 0,
-                "payment_type": "",
+                "payment_type": "cashless",
                 "consumer_fullname": "",
                 "consumer_phone_number": "",
-                "time_type": "",
+                "time_type": "daytime",
                 "starts_at": "",
                 "number": "",
-                "duration": 0,
-                "term": "",
+                "duration": 1,
+                "term": "hours",
                 "type": "",
                 "deposit": 0
             },
             add_resident_form: {
-                "payment_type": "",
+                "payment_type": "cashless",
                 "fullname": "",
                 "phone_number": "",
                 "profession": "",
-                "time_type": "",
+                "time_type": "daytime",
                 "submit_function": "calculate_price",
                 "starts_at": "",
                 "place_number": "",
-                "duration": 0,
-                "term": "",
+                "duration": 1,
+                "term": "hours",
                 "place_type": "",
                 "used_discount": 0,
                 "price": 0
@@ -93,20 +93,20 @@ const main_section_app = Vue.createApp({
             renew_resident_form: {
                 resident: 0,
                 resident_id: 0,
-                duration: 0,
-                term: "",
-                time_type: "",
+                duration: 1,
+                term: "hours",
+                time_type: "daytime",
                 price: 0,
                 used_discount: 0,
-                payment_type: "",
+                payment_type: "cashless",
                 submit_function: "calculate_price"
             },
             renew_booked_place_form: {
                 booked_place: 0,
                 booked_place_id: 0,
-                duration: 0,
-                term: "",
-                time_type: ""
+                duration: 1,
+                term: "hours",
+                time_type: "daytime"
             },
 
             current_opened_deleted_booked_place: null,
@@ -278,6 +278,8 @@ const main_section_app = Vue.createApp({
             axios.get('/site_settings/get_place_types/').then((response) => {
                 this.place_types = []
                 response.data["place_types"].forEach(place_type => this.place_types.unshift(place_type["fields"]["name"]))
+                this.add_booked_place_form["type"] = response.data["place_types"][0]["fields"]["name"]
+                this.add_resident_form["place_type"] = response.data["place_types"][0]["fields"]["name"]
             })
         },
         choose_section(section_name) {
@@ -307,6 +309,9 @@ const main_section_app = Vue.createApp({
                 this.add_resident_form["booked_place"] = null
                 this.add_resident_form["booked_place_id"] = 0
             }
+
+            this.add_booked_place_form["starts_at"] = moment().format('YYYY-MM-DDTHH:mm')
+            this.add_resident_form["starts_at"] = moment().format('YYYY-MM-DDTHH:mm')
         },
         submit_add_booked_place_form() {
             swal({
@@ -339,15 +344,15 @@ const main_section_app = Vue.createApp({
                     this.add_booked_place_form = {
                         "booking_request": null,
                         "booking_request_id": 0,
-                        "payment_type": "",
+                        "payment_type": "cashless",
                         "consumer_fullname": "",
                         "consumer_phone_number": "",
-                        "time_type": "",
-                        "starts_at": "",
+                        "time_type": "daytime",
+                        "starts_at": moment().format('YYYY-MM-DDTHH:mm'),
                         "number": "",
-                        "duration": 0,
-                        "term": "",
-                        "type": "",
+                        "duration": 1,
+                        "term": "hours",
+                        "type": this.place_types[0],
                         "deposit": 0
                     }
                 }).catch((error) => {
@@ -402,17 +407,17 @@ const main_section_app = Vue.createApp({
                                 this.booked_places.splice(this.booked_places.indexOf(this.add_resident_form["booked_place"]), 1)
                             }
                             this.add_resident_form = {
-                                "payment_type": "",
+                                "payment_type": "cashless",
                                 "fullname": "",
                                 "phone_number": "",
                                 "profession": "",
-                                "time_type": "",
+                                "time_type": "daytime",
                                 "submit_function": "calculate_price",
-                                "starts_at": "",
+                                "starts_at": moment().format('YYYY-MM-DDTHH:mm'),
                                 "place_number": "",
-                                "duration": 0,
-                                "term": "",
-                                "place_type": "",
+                                "duration": 1,
+                                "term": "hours",
+                                "place_type": this.place_types[0],
                                 "used_discount": 0,
                                 "price": 0
                             }
@@ -567,12 +572,12 @@ const main_section_app = Vue.createApp({
             this.renew_resident_form = {
                 resident: resident,
                 resident_id: resident.id,
-                duration: 0,
-                term: "",
-                time_type: "",
+                duration: 1,
+                term: "hours",
+                time_type: "daytime",
                 price: 0,
                 used_discount: 0,
-                payment_type: "",
+                payment_type: "cashless",
                 submit_function: "calculate_price"
             }
         },
@@ -631,9 +636,9 @@ const main_section_app = Vue.createApp({
             this.renew_booked_place_form = {
                 booked_place: booked_place,
                 booked_place_id: booked_place.id,
-                duration: 0,
-                term: "",
-                time_type: ""
+                duration: 1,
+                term: "hours",
+                time_type: "daytime"
             }
         },
         submit_renew_booked_place_form() {

@@ -1,7 +1,8 @@
 function update_booking_requests_analytics(analytics) {
-    update_simple_chart(booking_requests_place_types_chart, analytics["place_types"])
-    update_difficult_chart(booking_requests_count_chart, analytics["booking_requests_count"], ["total"])
-    _set_total_booking_requests_count(analytics["booking_requests_count"]["total"])
+    update_chart(booking_requests_place_types_chart, analytics["place_types"])
+    update_chart(booking_requests_count_chart, analytics["booking_requests_count"])
+
+    _set_total_booking_requests_count(analytics["booking_requests_total_count"])
     _set_response_times(analytics["response_times"])
     _set_rejection_reasons_list(analytics["rejection_reasons_list"])
 }

@@ -65,7 +65,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'admin_actions.middleware.set_request_user_to_thread_local_variable.SetRequestUserToThreadLocalVariable'
+    'admin_actions.middleware.set_request_user_to_thread_local_variable.SetRequestUserToThreadLocalVariable',
+    'site_settings.cache_control_middleware.CacheControlMiddleware'
 ]
 
 ROOT_URLCONF = 'project.urls'

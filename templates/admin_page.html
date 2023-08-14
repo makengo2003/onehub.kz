@@ -16,6 +16,20 @@
     <link rel="stylesheet" href="{% static 'css/admin_page/price.css' %}">
 
     <style>
+        .select_analytics_period_btn, .selected_analytics_period_btn {
+            background-color: #fed471;
+            color: black;
+            border: 1px solid #b49751;
+            font-size: 15px;
+            padding: 3px 15px;
+        }
+
+        .select_analytics_period_btn {
+            background-color: #f6f6f6;
+            border-color: #bbbbbb;
+            color: #535353;
+        }
+
         .period_selects button {
             display: block;
             margin-left: 20px;
@@ -817,10 +831,10 @@
                     <p>Номер телефона</p>
                 </div>
                 <div class="place">
-                    <p @click="booked_places_order_by('number')">
-                        Место
-                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'number'"><b>↑</b></span>
-                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-number'"><b>↓</b></span>
+                    <p @click="booked_places_order_by('deposit')">
+                        Депозит
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'deposit'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-deposit'"><b>↓</b></span>
                     </p>
                 </div>
                 <div class="placeType">
@@ -859,7 +873,7 @@
                             <p>${ booked_place.consumer_phone_number }</p>
                         </div>
                         <div class="place">
-                            <p>${ booked_place.number }</p>
+                            <p>${ booked_place.deposit }</p>
                         </div>
                         <div class="placeType">
                             <p>${ booked_place.type }</p>
@@ -1235,22 +1249,16 @@
 
 
 <div id="analytics_section" class="container analtics_page" style="display: none">
-  <form class="period_form" onsubmit="get_analytics(event)">
-      <b>Пероид</b>
-    <div class="period_selects">
-      <div class="period_select">
-          <span>С</span>
-        <input type="date" name="period_starts_at" required onchange="analytics_starts_at = this.value">
+  <div class="period_form">
+      <b style="margin-bottom: 7px">Пероид</b>
+      <div id="select_analytics_period_block" style="display: flex; margin-bottom: 20px">
+        <button id="today_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('today')">Сегодня</button>
+        <button id="yesterday_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('yesterday')">Вчера</button>
+        <button id="week_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('week_ago')">Неделя</button>
+        <button id="month_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('month_ago')">Месяц</button>
+        <button id="year_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('year_ago')">Год</button>
       </div>
-
-      <div class="period_select finish">
-          <span>До</span>
-        <input type="date" name="period_finish_at" required onchange="analytics_ends_at = this.value">
-      </div>
-
-      <button type="submit">Получить аналитику</button>
-    </div>
-  </form>
+  </div>
 
     <div id="analytics" style="display: none">
         <div class="residents_analytic analityc_block">
@@ -1305,9 +1313,6 @@
               <canvas id="booked_places_count"></canvas>
             </div>
             <div class="chart">
-              <canvas id="booked_places_deposits_line"></canvas>
-            </div>
-            <div class="chart">
               <canvas id="booked_places_place_types"></canvas>
             </div>
             <div class="chart">
@@ -1315,9 +1320,6 @@
             </div>
             <div class="chart">
               <canvas id="booked_places_terms"></canvas>
-            </div>
-            <div class="chart">
-              <canvas id="booked_places_deposits_grouped_by_payment_type"></canvas>
             </div>
           </div>
         </details>
@@ -1358,22 +1360,20 @@
 
 {% if request.user.is_superuser %}
 <div id="admin_actions_section" class="container analtics_page" style="display: none">
-  <form class="period_form" @submit.prevent="get_admin_actions()">
+  <div class="period_form">
       <b>Пероид</b>
     <div class="period_selects">
       <div class="period_select">
           <span style="margin-right: 4px">С</span>
-        <input type="date" name="period_starts_at" required v-model="starts_at">
+        <input type="datetime-local" name="period_starts_at" required v-model="starts_at" @change="get_admin_actions">
       </div>
 
       <div class="period_select finish">
           <span style="margin-right: 4px">До</span>
-        <input type="date" name="period_finish_at" required v-model="ends_at">
+        <input type="datetime-local" name="period_finish_at" required v-model="ends_at" @change="get_admin_actions">
       </div>
-
-      <button type="submit">Получить action log</button>
     </div>
-  </form>
+  </div>
 
     <div id="admin_actions" v-if="admin_actions.length > 0">
         <div class="residents_analytic">
