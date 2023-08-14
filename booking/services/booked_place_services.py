@@ -31,18 +31,14 @@ def calculate_booking_expires_at_dt(booking_starts_at: datetime, duration: int, 
         else:  # term.startswith("months")
             booking_expires_at = booking_starts_at + relativedelta(months=duration)
 
-        if time_type == "daytime":
-            booking_expires_at_date = booking_expires_at.date()
-            booking_expires_at = datetime(booking_expires_at_date.year,
-                                          booking_expires_at_date.month,
-                                          booking_expires_at_date.day - 1,
-                                          22, 0)
-        elif time_type == "nighttime":
-            booking_expires_at_date = booking_expires_at.date()
-            booking_expires_at = datetime(booking_expires_at_date.year,
-                                          booking_expires_at_date.month,
-                                          booking_expires_at_date.day - (booking_expires_at.time().hour < 8),
-                                          8, 0)
+        days = 1  # if time_type == "daytime"
+        hour = 22
+        if time_type == "nighttime":
+            days = (booking_expires_at.time().hour < 8)
+            hour = 8
+
+        booking_expires_at = booking_expires_at - relativedelta(days=days)
+        booking_expires_at = booking_expires_at.replace(hour=hour, minute=0)
 
         return booking_expires_at
 
@@ -117,10 +113,10 @@ def add_booked_place(booked_place_info: Mapping) -> Tuple[Success, StatusCode, M
 
         if form.cleaned_data["booking_request_id"] > 0:
             _make_booking_request_accepted(form.cleaned_data["booking_request_id"], booked_place.id)
-            title = f"Принял(а) запрос и забронировал место для {booked_place.consumer_fullname}" \
+            title = f"Принял(а) запрос и забронировал {booked_place.type} для {booked_place.consumer_fullname}" \
                     f"({booked_place.starts_at.strftime('%d.%m.%Y, %H:%M')} --- {booked_place.expires_at.strftime('%d.%m.%Y, %H:%M')})"
         else:
-            title = f"Забронировал(а) место для {booked_place.consumer_fullname}" \
+            title = f"Забронировал(а) {booked_place.type} для {booked_place.consumer_fullname}" \
                     f"({booked_place.starts_at.strftime('%d.%m.%Y, %H:%M')} --- {booked_place.expires_at.strftime('%d.%m.%Y, %H:%M')})"
 
         AdminAction.objects.create(admin_fullname=request_user.username,

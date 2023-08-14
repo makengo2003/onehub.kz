@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 
 class GetAdminActionsRequestSchema(serializers.Serializer):
-    starts_at = serializers.DateField()
-    ends_at = serializers.DateField()
+    starts_at = serializers.DateTimeField()
+    ends_at = serializers.DateTimeField()
 
     def validate(self, attrs):
         if attrs["starts_at"] > attrs["ends_at"]:

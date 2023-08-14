@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 
 def get_admin_actions(starts_at: datetime, ends_at: datetime) -> AdminActionSerializer:
     admin_actions = AdminAction.objects.filter(
-        Q(created_at__gte=starts_at) & Q(created_at__lte=ends_at + relativedelta(days=1))
+        Q(created_at__gte=starts_at) & Q(created_at__lte=ends_at)
     ).order_by("-created_at")
 
     return AdminActionSerializer(admin_actions, many=True)

@@ -1,4 +1,5 @@
-var analytics_starts_at, analytics_ends_at
+var current_selected_period = null
+
 const CHART_COLORS = {
     c: '#4c6d89',
     c0: '#4f8cc1',
@@ -17,14 +18,39 @@ const CHART_COLORS = {
     grey: 'rgb(201, 203, 207)'
 };
 
+function get_chart_options(title) {
+    return {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: title
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) { return get_percentage(context) }
+                }
+            }
+        }
+    }
+}
 
-function get_analytics(event) {
-    event.preventDefault()
+function get_analytics(period) {
+    if (!current_selected_period) {
+        current_selected_period = document.getElementById(period + "_analytics_period_select_btn")
+        current_selected_period.className = "selected_analytics_period_btn"
+    } else {
+        current_selected_period.className = "select_analytics_period_btn"
+        current_selected_period = document.getElementById(period + "_analytics_period_select_btn")
+        current_selected_period.className = "selected_analytics_period_btn"
+    }
 
     axios.get("/analytics/get_analytics/", {
         params: {
-            starts_at: analytics_starts_at,
-            ends_at: analytics_ends_at
+            period_label: period
         }
     }).then((response) => {
         update_booking_requests_analytics(response.data["booking_requests_analytics"])
@@ -34,7 +60,6 @@ function get_analytics(event) {
         document.getElementById("analytics").style.display = "block"
     })
 }
-
 
 function get_percentage(context) {
     let label = context.dataset.label || '';
@@ -54,108 +79,14 @@ function get_percentage(context) {
     return label;
 }
 
+function update_chart(chart, data) {
+    chart.data.labels = data["labels"]
+    chart.data.datasets = []
 
-function update_simple_chart(chart, data) {
-    var labels = []
-    var chart_data = []
-
-    for (var label in data) {
-        labels.push(label)
-        chart_data.push(data[label])
+    if (chart.type == "pie") {
+        data["datasets"][0]["backgroundColor"] = Object.values(CHART_COLORS)
     }
 
-    chart.data.labels = labels
-    chart.data.datasets[0].data = chart_data
+    chart.data.datasets = data["datasets"]
     chart.update()
-}
-
-
-function update_difficult_chart(chart, data, exclude_keys=[]) {
-    var i = 0
-
-    for (var key in data) {
-        if (exclude_keys.includes(key)) {
-            continue
-        }
-
-        var period_as_dict = _get_inputted_analytics_period_as_dict()
-        _fill_period_as_dict_with_data(period_as_dict, data[key])
-        chart.data.datasets[i].data = _get_chart_data_from_period_as_dict(period_as_dict)
-
-        i++
-    }
-
-    chart.data.labels = _get_labels_from_period_as_dict(period_as_dict)
-    chart.update()
-}
-
-
-function _get_inputted_analytics_period_as_dict() {
-    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var starts_at = new Date(analytics_starts_at)
-    var ends_at = new Date(analytics_ends_at)
-    var period_as_dict = {}
-
-    for (var i = starts_at.getFullYear(); i <= ends_at.getFullYear(); i++) {
-        var months_starts_at = 0
-        var months_ends_at = 0
-
-        if (i == starts_at.getFullYear()) {
-            months_starts_at = starts_at.getMonth()
-
-            if (i == ends_at.getFullYear()) {
-                months_ends_at = ends_at.getMonth()
-            } else {
-                months_ends_at = 11
-            }
-        } else if (i == ends_at.getFullYear()) {
-            months_starts_at = 0
-            months_ends_at = ends_at.getMonth()
-        } else {
-            months_starts_at = 0
-            months_ends_at = 11
-        }
-
-        period_as_dict[i] = {}
-
-        for (var j = months_starts_at; j <= months_ends_at; j++) {
-            period_as_dict[i][j] = {
-                label: months[j] + " " + i + "y.",
-                data: 0
-            }
-        }
-    }
-
-    return period_as_dict
-}
-
-
-function _fill_period_as_dict_with_data(period_as_dict, data) {
-    for (var year in data) {
-        for (var month in data[year]) {
-            period_as_dict[year][month]["data"] = data[year][month]
-        }
-    }
-}
-
-
-function _get_chart_data_from_period_as_dict(period_as_dict) {
-    var chart_data = []
-    for (var year in period_as_dict) {
-        for (var month in period_as_dict[year]) {
-            chart_data.push(period_as_dict[year][month]["data"])
-        }
-    }
-    return chart_data
-}
-
-
-function _get_labels_from_period_as_dict(period_as_dict) {
-    var labels = []
-    for (var year in period_as_dict) {
-        for (var month in period_as_dict[year]) {
-            labels.push(period_as_dict[year][month]["label"])
-        }
-    }
-    return labels
 }
