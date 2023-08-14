@@ -944,4 +944,3 @@ const main_section_app = Vue.createApp({
 })
 
 main_section_app.config.compilerOptions.delimiters = ["${", "}"];
-alert("Hello world")
