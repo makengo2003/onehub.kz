@@ -1,0 +1,287 @@
+#add_booked_locker_form {
+  background: rgba(102, 102, 102, 0.95);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+
+#add_booked_locker_form:target {
+  display: block;
+}
+
+#booking_request_rejection_form-zatemnenie {
+  background: rgba(102, 102, 102, 0.95);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+
+#booking_request_rejection_form-zatemnenie:target {
+  display: block;
+}
+
+#booking_request_rejection_form-zatemnenie input[type="submit"], #add_booked_locker_form button {
+    background: none;
+    border: none;
+    background-color: green;
+    padding: 6px 20px;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: block;
+    margin: auto;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+#booking_request_rejection_form-zatemnenie textarea {
+    width: -webkit-fill-available;
+    height: 100px;
+    outline: none;
+    font-size: 17px;
+    font-family: sans-serif;
+}
+
+#extend-zatemnenie, #renew_resident-zatemnenie, #renew_booked_place-zatemnenie {
+  background: rgba(102, 102, 102, 0.95);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+
+#extend-zatemnenie:target, #renew_resident-zatemnenie:target, #renew_booked_place-zatemnenie:target {
+  display: block;
+}
+
+.extend_block{
+  border-radius: 10px;
+  background-color: white;
+  width: 400px;
+  padding: 20px;
+  margin: 40px auto;
+  position: relative;
+}
+
+#add_booked_locker_form .extend_block {
+    width: 325px;
+    margin: 150px auto;
+}
+
+#extend-zatemnenie .extend_block, #renew_resident-zatemnenie .extend_block, #renew_booked_place-zatemnenie .extend_block {
+    margin: 165px auto;
+}
+
+.payment{
+  margin-bottom: 20px;
+}
+
+#add-zatemnenie p, #extend-zatemnenie p, #renew_resident-zatemnenie p, #renew_booked_place-zatemnenie p, #add_booked_locker_form p {
+  color: #002B5B;
+  font-weight: bold;
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+.booked_period_starts_at p {
+    width: max-content;
+}
+
+.payment label, .extend_block select, .which_one_add label{
+  color: #002B5B;
+  font-size: 17px;
+  margin-bottom: 20px;
+  border-color: #002B5B;
+  border-radius: 3px;
+  height: 29px;
+}
+
+.period select, .time_type select {
+  width: 128px;
+}
+
+.number_of_place input {
+    width: 116px;
+}
+
+#add_booked_locker_form .number_of_place input {
+    width: initial;
+}
+
+.number_of_place p {
+    width: max-content;
+}
+
+.type_of_place select {
+    width: 230px;
+}
+
+.extend_btn button{
+  background-color: green;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 30px;
+  border: none;
+  font-size: 18px;
+}
+
+.close{
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.close img {
+  height: 15px;
+}
+
+#add-zatemnenie {
+  background: rgba(102, 102, 102, 0.95);
+  width: 100%;
+  height: 130%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+
+#add-zatemnenie:target {
+  display: block;
+}
+
+#add-zatemnenie input, #extend-zatemnenie input, #renew_resident-zatemnenie input, #renew_booked_place-zatemnenie input, #add_booked_locker_form input {
+/*.FIO input, .place_info input, .duration input, .discount_for_place input, .consumer_phone_number input, .booked_period_starts_at input {*/
+  margin-bottom: 15px;
+  border-radius: 3px;
+  border: 1px solid #002B5B;
+  padding: 3px 5px;
+  font-size: 18px;
+}
+
+#extend-zatemnenie input[name='booked_period_starts_at'] {
+    width: 221px;
+}
+
+#add-zatemnenie .booked_period_starts_at input {
+    width: 225px;
+    padding: 1.9px;
+}
+
+.discount_for_place input {
+  width: 116px;
+}
+
+.add_btn button{
+  background-color: green;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 30px;
+  border: none;
+  font-size: 18px;
+}
+
+.add_checkbox, .extend_checkbox {
+  display: none;
+}
+
+.add_checkbox ~ label::before {
+  content: '\2713';
+  text-align: center;
+  color: white;
+  line-height: 1em;
+  width: 15px;
+  height: 15px;
+  border: 1px inset black;
+  border-radius: 0.25em;
+  margin: 0.25em;
+  display: inline-block;
+}
+.add_checkbox:checked ~ label::before {
+  color: black;
+  border: 1px inset black;
+}
+
+.extend_checkbox ~ label::before {
+  content: '\2713';
+  text-align: center;
+  color: white;
+  line-height: 1em;
+  width: 15px;
+  height: 15px;
+  border: 1px inset black;
+  border-radius: 0.25em;
+  margin: 0.25em;
+  display: inline-block;
+}
+.extend_checkbox:checked ~ label::before {
+  color: black;
+  border: 1px inset black;
+}
+
+
+
+.place_info {
+  display: flex;
+}
+
+
+#login_change {
+   background: rgba(102, 102, 102, 0.95);
+   width: 100%;
+   height: 100%;
+   position: fixed;
+   top: 0;
+   left: 0;
+   display: none;
+   z-index: 2002;
+ }
+
+ #login_change:target {
+   display: block;
+ }
+
+
+
+.login_block{
+  width: 400px;
+  padding: 20px 20px 20px 20px;
+  background-color: white;
+  z-index: 1;
+  border-radius: 5px;
+  position: relative;
+  margin: 70px auto 100px auto;
+}
+
+.login_block b{
+  font-size: 18px;
+}
+
+.close a {
+    color: black;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.book_btn button {
+    width: calc(100% - 2px);
+    margin: 10px 0;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 5px;
+    background-color: #004761;
+    color: white;
+    border: none;
+}

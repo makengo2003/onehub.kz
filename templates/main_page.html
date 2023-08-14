@@ -1,0 +1,536 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>OneHub - коворкинг в Шымкенте</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <link rel="stylesheet" href="{% static 'css/main_page/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_page/zatemnenie_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_page/mediaMain.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_page/hamburger.css' %}">
+  	<link rel="stylesheet" href="{% static 'css/main_page/price.css' %}">
+	<link rel="stylesheet" href="{% static 'css/main_page/mediaPrice.css' %}">
+
+  </head>
+  <body>
+
+	<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(90626678, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/90626678" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+    <div class="container">
+
+    <div class="navbar block">
+      <div class="hamburger-menu">
+           <input id="menu__toggle" type="checkbox">
+           <label class="menu__btn" for="menu__toggle">
+             <span></span>
+           </label>
+           <ul class="menu__box">
+            <!-- <li><a class="menu__item" onclick="open_prices()" style="cursor: pointer;">Прайс</a></li> -->
+            <li><a class="menu__item" onclick="window.location.hash = 'booking_form'">Бронирование</a></li>
+            <li><a class="menu__item" href="dogovor-oferta/">Договор - оферта</a></li>
+            <li><a style="color: blue" class="menu__item" href="#login_form">Войти</a></li>
+          </ul>
+        </div>
+
+      <div class="nav_left">
+        <a href="/" class="logo_a">
+          <div class="logo">
+            <img src="{% static 'imgs/main_page/oneHub.png' %}" alt="">
+          </div>
+        </a>
+
+        <div class="nav_links">
+          <!-- <div class="nav_link">
+            <a onclick="open_prices()" style="cursor: pointer;">Прайс</a>  
+          </div> -->
+          <div class="nav_link">
+            <a onclick="window.location.hash = 'booking_form'">Бронирование</a>
+          </div>
+          <div class="nav_link">
+            <a href="dogovor-oferta/">Договор - оферта</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav_right">
+        <div class="login_btn" id="login_btn">
+          <a href="#login_form">Войти</a>
+        </div>
+      </div>
+    </div>
+
+    
+
+
+      <div class="price_block" style="display: none;" id="prices_block">
+        <a style="cursor: pointer;" onclick="close_prices()"><img src="{% static 'imgs/main_page/arrow.png' %}" alt="">Прайс</a>
+          {% for place_type, prices in place_types.items %}
+        <div class="main_price_block">
+            <h3>{{ place_type }}</h3>
+			<div class="row">
+				<div class="col lt top first">
+					<span class="bold">Доступ</span>
+				</div>
+				<div class="col top second">
+					<span class="bold">Время дня</span>
+				</div>
+				<div class="col rt top third">
+					<span class="bold">Стоимость</span>
+				</div>
+			</div>
+            {% for price in prices %}
+			<div class="row">
+				<div class="col first">
+					<span>{{ price.duration }} {{ price.get_term_display }}</span>
+				</div>
+				<div class="col second">
+                    {% if price.time_type == "daytime" %}
+					<span>День<br>08.00 - 22.00</span>
+                    {% elif price.time_type == "nighttime" %}
+					<span>Ночь<br>22.00 - 08.00</span>
+                    {% elif price.time_type == "day" %}
+					<span>24/7</span>
+                    {% else %}
+					<span>Любое время</span>
+                    {% endif %}
+				</div>
+				<div class="col third">
+					<span>{{ price.price }} тг</span>
+				</div>
+			</div>
+            {% endfor %}
+		</div>
+          {% endfor %}
+      </div>
+
+      <div id="main_page_block">
+        <div class="slider_block block">
+          <div class="sliderr" style="margin: auto 0px; ">
+            <div id="slider" style="display: flex; overflow-x: hidden;">
+              {% for image in carousel_images %}
+              <img src="{{ image.image.url }}">
+              {% endfor %}
+            </div>
+          </div>
+
+          <form action="leave_booking_request/" method="post" id="leave_booking_request_form1">
+            {% csrf_token %}
+            <div class="booking">
+              <div class="booking_title">
+                <h1>Оставить заявку</h1>
+              </div>
+
+              <div class="booking_text">
+                <p>Мы уверены, что наши рабочие зоны подойдут вам по всем критериям. Для бронирования заполните анкету, наши менеджера обязательно свяжуться с вами</p>
+              </div>
+
+              <div class="book_input">
+                <input required type="text" name="consumer_fullname"  placeholder="ФИО">
+              </div>
+
+              <div class="book_input">
+                <input required type="text" name="consumer_phone_number" placeholder="+7 777 777 77 77" value="+7">
+              </div>
+
+              <div class="book_input">
+                <select name="place_type">
+                    <option value="Офисное пространство">Офисное пространство</option>
+                    {% for place_type in place_types.keys %}
+                    <option value="{{ place_type }}">{{ place_type }}</option>
+                    {% endfor %}
+                </select>
+              </div>
+
+              <div class="btn">
+                <button type="submit" name="button">Оставить заявку</button>
+              </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="onehub_stats block">
+      <div class="stat fir_stat">
+        <b>8500+ часов</b>
+        <p>резиденты провели у нас</p>
+      </div>
+      
+      <div class="stat fir_stat">
+        <b>более 600</b>
+        <p>резидентов за все время</p>
+      </div>
+      
+      <div class="stat sec_stat">
+        <b>более 35</b>
+        <p>мероприятии</p>
+      </div>
+
+      <div class="stat sec_stat">
+        <b>около 10</b>
+        <p>компании на базе</p>
+      </div>
+    </div>
+
+    <div class="facilities block">
+      <b class="facilities_title">Что вы получите за резидентство</b>
+      <div class="facility">
+        <div class="facility_img">
+          <img src="{% static 'imgs/main_page/img1.jfif' %}" alt="">
+        </div>
+
+        <div class="facility_info">
+          <b>Намазхана</b>
+          <p>Наши резиденты большую часть своей времени проводят в коворкинге, поэтому…</p>
+        </div>
+      </div>
+
+      <div class="facility">
+        <div class="facility_img">
+          <img src="{% static 'imgs/main_page/img2.png' %}" alt="">
+        </div>
+
+        <div class="facility_info">
+          <b>Столовая</b>
+          <p>В коворкинге рассмотрена столовая комната. Столовая комната оборудована холодильником, микроволновой печью, чайниками и т.д.</p>
+        </div>
+      </div>
+
+      <div class="facility">
+        <div class="facility_img">
+          <img src="{% static 'imgs/main_page/img3.png' %}" alt="">
+        </div>
+
+        <div class="facility_info">
+          <b>Зона для отдыха</b>
+          <p>После трудноемкой работы можете посидеть и расслабиться в наших зонах для отдыха. Зона для отдыха оборудована мягкими подушками, ковроланом на полу для уюта, журнальными столиками и т.д.</p>
+        </div>
+      </div>
+
+      <div class="facility">
+        <div class="facility_img">
+          <img src="{% static 'imgs/main_page/img4.png' %}" alt="">
+        </div>
+
+        <div class="facility_info">
+          <b>Кофейня</b>
+          <p>В коворкинге есть кофейня CoffeeHub. Всем нашим резидентам 7 чашка кофе бесплатно.</p>
+        </div>
+      </div>
+    </div>
+      </div>
+    </div>
+
+
+
+    <footer>
+      <div class="container footer_container">
+        <div class="footer">
+          <div class="footer_logo">
+            <img src="{% static 'imgs/main_page/footer_logo.png' %}" alt="">
+          </div>
+
+          <div class="footer_blocks">
+            <div class="footer_block">
+              <b>Компания</b>
+
+              <!-- <div class="footer_link">
+                <a onclick="open_prices()">Прайс</a>
+              </div> -->
+
+              <div class="footer_link">
+                <a href="#booking_form">Бронирование</a>
+              </div>
+
+              <div class="footer_link">
+                <a href="dogovor-oferta/">Договор-офферта</a>
+              </div>
+            </div>
+
+            <div class="footer_block sec_footer_block">
+              <b>Связаться с нами</b>
+
+              <div class="footer_link">
+                <a>+7 776 001 9324</a>
+              </div>
+
+              <div class="footer_link">
+                <a>onehub.kz@gmail.com</a>
+              </div>
+
+              <div class="footer_link">
+                <a href="https://www.instagram.com/onehub.coworking/">instagram: @onehub.coworking</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="copyright">
+            <hr>
+            <span>2022 © OneHub - коворкинг в Шымкенте</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div id="login_form">
+      <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="login_block">
+          <div class="close">
+            <a href="#">✖</a>  
+          </div>
+
+          <h2 style="margin: 0 0 15px 0px">Войти</h2>
+
+          <div class="book_input">
+            <span>Имя пользователя</span>
+            <input type="text" name="username" required>
+          </div>
+
+          <div class="book_input">
+            <span>Пароль</span>
+            <input type="password" name="password" required>
+          </div>
+
+          <div class="book_btn">
+            <button type="submit">Войти</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="booking_form">
+      <form action="leave_booking_request/" method="post" id="leave_booking_request_form2">
+        {% csrf_token %}
+        <div class="booking_modal_window" style="position: relative;">
+          <div class="close">
+            <a href="#">✖</a>  
+          </div>
+
+          <div class="booking_title">
+            <h1>Оставить заявку</h1>
+          </div>
+
+          <div class="booking_text">
+            <p>Мы уверены, что наши рабочие зоны подойдут вам по всем критериям. Для бронирования заполните анкету, наши менеджера обязательно свяжуться с вами</p>
+          </div>
+
+          <div class="book_input">
+            <span>ФИО</span>
+            <input type="text" name="consumer_fullname" required>
+          </div>
+
+          <div class="book_input">
+            <span>Номер телефона</span>
+            <input type="text" name="consumer_phone_number" required value="+7">
+          </div>
+
+          <div class="book_input">
+            <span>Тип места</span>
+            <select name="place_type">
+                <option value="Офисное пространство">Офисное пространство</option>
+                {% for place_type in place_types.keys %}
+                <option value="{{ place_type }}">{{ place_type }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="btn">
+            <button type="submit">Оставить заявку</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="officeplace-zatemnenie" style="display: none;">
+      <div>
+        <div class="main_block">
+          <div class="img_block">
+            <img src="{% static 'imgs/main_page/simple-07.jpg' %}">
+          </div>
+
+          <div class="text_block">
+            <div class="text_title">
+              <h2>Офисное помещение</h2>
+            </div>
+
+            <div class="text_main">
+              <p>Закрытые офисы со стильным дизайном, создают прекрасную рабочую среду для компаний малого и среднего бизнеса.</p>
+              <h5 style="margin: 0">ЧТО ВХОДИТ</h5>
+              <ul>
+                <li>Круглосуточный доступ</li>
+                <li>Полностью меблированный офис</li>
+                <li>Высокоскоростной интернет</li>
+                <li>Зона отдыха, meditation room</li>
+                <li>Кухня</li>
+                <li>Паркинг</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="close">
+            <a href="#"><img src="{% static 'imgs/main_page/close1.png' %}"></a>
+          </div>
+
+          <div class="booking_link">
+            <a onclick="window.location.hash = 'booking_form'">Забронировать</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="fixedplace-zatemnenie" style="display: none;">
+      <div>
+        <div class="main_block">
+          <div class="img_block">
+            <img src="{% static 'imgs/main_page/simple-07.jpg' %}">
+          </div>
+
+          <div class="text_block">
+            <div class="text_title">
+              <h2>Закрепленное рабочее место</h2>
+            </div>
+
+            <div class="text_main">
+              <p>Закрепленное рабочее место — это выбранный вами рабочий стол в открытом пространстве (open space) к которому у вас есть доступ 24/7.</p>
+              <h5 style="margin: 0">ЧТО ВХОДИТ</h5>
+              <ul>
+                <li>Круглосуточный доступ</li>
+                <li>Закрепленное рабочее место</li>
+                <li>Комфортабельное рабочее место: стол и кресло</li>
+                <li>Высокоскоростной интернет</li>
+                <li>Зона отдыха, meditation room</li>
+                <li>Кухня</li>
+                <li>Распечатка на МФУ</li>
+                <li>Паркинг</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="close">
+            <a href="#"><img src="{% static 'imgs/main_page/close1.png' %}"></a>
+          </div>
+
+          <div class="booking_link">
+            <a onclick="window.location.hash = 'booking_form'">Забронировать</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="looseplace-zatemnenie" style="display: none;">
+      <div>
+        <div class="main_block">
+          <div class="img_block">
+            <img src="{% static 'imgs/main_page/simple-07.jpg' %}">
+          </div>
+
+          <div class="text_block">
+            <div class="text_title">
+              <h2>Незакрепленное место</h2>
+            </div>
+
+            <div class="text_main">
+              <p>Не закрепленное рабочее место — это возможность использования любого свободного рабочего стола в открытом пространстве (open space). Любой резидент в любой день может использовать любое незанятое рабочее место в коворкинге.</p>
+              <h5 style="margin: 0">ЧТО ВХОДИТ</h5>
+              <ul>
+                <li>Круглосуточный доступ</li>
+                <li>Не закрепленное, любое свободное место</li>
+                <li>Комфортабельное рабочее место: стол и кресло</li>
+                <li>Высокоскоростной интернет</li>
+                <li>Зона отдыха, meditation room</li>
+                <li>Кухня</li>
+                <li>Распечатка на МФУ</li>
+                <li>Паркинг</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="close">
+            <a href="#"><img src="{% static 'imgs/main_page/close1.png' %}"></a>
+          </div>
+
+          <div class="booking_link">
+            <a onclick="window.location.hash = 'booking_form'">Забронировать</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="meetingroom-zatemnenie" style="display: none;">
+      <div>
+        <div class="main_block">
+          <div class="img_block">
+            <img src="{% static 'imgs/main_page/simple-07.jpg' %}">
+          </div>
+
+          <div class="text_block">
+            <div class="text_title">
+              <h2>Переговорная комната</h2>
+            </div>
+
+            <div class="text_main">
+              <p>Рабочие встречи для обсуждения насущных вопросов или мозговой штурм для поиска новых идей – все это можно провести в наших переговорных комнатах.</p>
+              <h5 style="margin: 0">ЧТО ВХОДИТ</h5>
+              <ul>
+                <li>Маркерная доска</li>
+                <li>Высокоскоростной интернет</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="close">
+            <a href="#"><img src="{% static 'imgs/main_page/close1.png' %}"></a>
+          </div>
+
+          <div class="booking_link">
+            <a onclick="window.location.hash = 'booking_form'">Забронировать</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="{% static 'js/axios.min.js' %}"></script>
+    <script src="{% static 'js/vue-cookies.js' %}"></script>
+    <script src="{% static 'js/landing_page.js' %}"></script>
+    <script>
+      var slider = document.getElementById("slider")
+var slider_imgs = slider.getElementsByTagName("img");
+
+function _slider_move() {
+	slider_imgs[1].className = ""
+
+	var temp = slider_imgs[0]
+	slider.removeChild(slider_imgs[0])
+	slider.appendChild(temp)
+
+	slider_imgs[1].removeEventListener("transitionend", _slider_move)
+}
+
+function slider_move() {
+	slider_imgs[1].className = "slider_move"
+	slider_imgs[1].addEventListener("transitionend", _slider_move);
+}
+
+setInterval(slider_move, 4000)
+    </script>
+</body></html>

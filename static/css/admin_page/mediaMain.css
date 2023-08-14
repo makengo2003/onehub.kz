@@ -1,0 +1,225 @@
+@media (max-width: 1300px){
+  .container{
+    width: 960px;
+  }
+
+  .booking{
+    width: 350px;
+    top: 9%;
+  }
+
+  .footer_logo img{
+    height: 75px;
+  }
+}
+
+@media (max-width: 990px){
+  .container{
+    width: 750px;
+  }
+
+  .hamburger-menu{
+    display: block;
+    position: absolute;
+    left: 0;
+    top: -6px;
+  }
+
+  .nav_left{
+    width: 100%;
+  }
+
+  .nav_links{
+    display: none;
+  }
+
+  .nav_right{
+    display: none;
+  }
+
+  .logo_a{
+    display: block;
+    margin: 0 auto;
+    width: 215px;
+  }
+
+  #slider{
+    width: 100%;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+  }
+
+  .booking{
+    position: relative;
+    margin: 0 auto;
+    left: 0;
+  }
+
+  .stat{
+    min-width: 340px;
+    text-align: center;
+  }
+
+  .sec_stat{
+    margin-top: 20px;
+  }
+
+  .facility_info{
+    margin-right: 5px;
+  }
+
+  .footer{
+    display: block;
+  }
+
+  .footer_blocks{
+    margin-top: 20px;
+    justify-content: space-between;
+  }
+
+  .footer_block{
+    margin: 0;
+  }
+
+  .footer_block b, .footer_block a{
+    font-size: 20px;
+  }
+
+  .footer_logo img{
+    height: 70px;
+  }
+}
+
+@media (max-width: 767px){
+  .container{
+    width: 540px;
+  }
+
+  .onehub_stats{
+    padding: 20px;
+  }
+
+  .stat{
+    min-width: 250px;
+  }
+
+  .facility_img img{
+    width: 220px;
+  }
+
+  .facility p{
+    font-size: 16px;
+  }
+
+  .facility b{
+    font-size: 25px;
+  }
+
+  .footer_block b{
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 560px){
+  .container{
+    width: 390px;
+  }
+
+  .stat{
+    width: 100%;
+  }
+
+  .onehub_stats{
+    padding: 10px 10px 30px 10px;
+  }
+
+  .sec_stat, .fir_stat{
+    margin-top: 20px;
+  }
+
+  .facilities{
+    padding: 20px;
+  }
+
+  .facilities b{
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .facilities p{
+    margin-top: 10px;
+  }
+
+  .facility{
+    display: block;
+  }
+
+  .facility_img img{
+    width: 100%;
+  }
+
+  .facility_info{
+    margin: 0;
+    text-align: center;
+  }
+
+  .footer_logo img{
+    height: 60px;
+  }
+
+  .footer_blocks{
+    display: block;
+  }
+
+  .sec_footer_block{
+    margin-top: 30px;
+  }
+
+  .booking_modal_window{
+    width: 350px;
+  }
+
+  .book_input option{
+    font-size: 16px;
+  }
+
+  .login_block{
+    width: 350px;
+  }
+}
+
+@media (max-width: 400px){
+  .login_block{
+    width: 280px;
+  }
+
+  .container{
+    width: 320px;
+  }
+
+  .logo_a{
+    width: 185px;
+  }
+
+  .logo_a img{
+    height: 26px;
+  }
+
+  .hamburger-menu{
+    top: -10px;
+  }
+
+  .booking{
+    width: 290px;
+    padding: 10px;
+  }
+
+  .footer_logo img{
+    height: 50px;
+  }
+
+  .booking_modal_window{
+    width: 280px;
+    padding-top: 30px;
+  }
+}

@@ -1,0 +1,63 @@
+@Media (max-width: 990px){
+	.main_price_block{
+		max-width: 600px;
+	}
+
+	.meeting_price_block{
+		max-width: 300px;
+	}
+
+	.conf_price_block{
+		max-width: 300px;
+	}
+}
+
+@Media (max-width: 650px){
+	.bold{
+		font-size: 16px;
+	}
+
+	span{
+		font-size: 15px;
+	}
+
+	.main_price_block{
+		max-width: 400px;
+	}
+
+	.meeting_price_block{
+		max-width: 300px;
+	}
+
+	.conf_price_block{
+		max-width: 300px;
+	}
+
+}
+
+@Media (max-width: 420px){
+	.bold{
+		font-size: 14px;
+	}
+
+	span{
+		font-size: 13px;
+	}
+
+	.main_price_block{
+		max-width: 340px;
+	}
+
+	.col{
+		padding: 5px;
+	}
+
+	.meeting_price_block{
+		max-width: 290px;
+	}
+
+	.conf_price_block{
+		max-width: 290px;
+	}
+
+}

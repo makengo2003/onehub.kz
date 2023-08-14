@@ -1,0 +1,72 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N812" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="exam.models.Exam.questions" />
+          <option value="exam.models.Exam.objects" />
+          <option value="quiz.models.Participant.objects" />
+          <option value="quiz.models.ParticipantsAnswer.objects" />
+          <option value="exam.models.Question.answers" />
+          <option value="exam.models.Question.id" />
+          <option value="quiz.models.ParticipantsSubAnswer.objects" />
+          <option value="django.db.models.fields.related.ForeignKey.timer_minutes" />
+          <option value="quiz.models.Participant.answers" />
+          <option value="quiz.models.Participant.id" />
+          <option value="django.http.request.HttpRequest.user" />
+          <option value="onehub_admin.models.BookedPlace.objects" />
+          <option value="onehub_admin.models.BookingRequest.objects" />
+          <option value="onehub_admin.models.VisitedDays.objects" />
+          <option value="onehub_admin.models.BookingRequest.id" />
+          <option value="onehub_admin.models.VisitedDays.id" />
+          <option value="onehub_admin.models.BookedPlace.id" />
+          <option value="onehub_admin.models.VisitedDays.booked_place_id" />
+          <option value="consumer.models.Consumer.objects" />
+          <option value="django.http.request.HttpRequest.consumer" />
+          <option value="exam.models.Exam.id" />
+          <option value="exam.models.Question.objects" />
+          <option value="consumer.models.Consumer.id" />
+          <option value="onehub_admin.models.BookedLocker.objects" />
+          <option value="django.db.models.fields.DateField.timestamp" />
+          <option value="django.db.models.fields.DateTimeField.timestamp" />
+          <option value="landing.models.OpeningEventParticipant.objects" />
+          <option value="user.models.BookingRequest.objects" />
+          <option value="booking.models.BookingRequest.objects" />
+          <option value="booking.models.BookedPlace.objects" />
+          <option value="booking.models.BookingRequest.id" />
+          <option value="booking.models.BookingRequest.objecs" />
+          <option value="resident.models.Resident.objects" />
+          <option value="resident.models.ResidentVisitedDay.objects" />
+          <option value="booking.models.RejectedBookingRequest.objects" />
+          <option value="booking.models.AcceptedBookingRequest.objects" />
+          <option value="booking.models.FromBookedPlaceToResident.objects" />
+          <option value="booking.models.FromBookedPlaceToResident.booked_place_id" />
+          <option value="booking.models.FromBookedPlaceToResident.resident_id" />
+          <option value="booking.models.RejectedBookingRequest.booking_request_id" />
+          <option value="booking.models.AcceptedBookingRequest.booking_request_id" />
+          <option value="booking.models.AcceptedBookingRequest.booked_place_id" />
+          <option value="site_settings.models.BookingRequestNotificationEmail.objects" />
+          <option value="django.db.models.fields.files.ImageField.url" />
+          <option value="site_settings.models.CarouselImage.objects" />
+          <option value="site_settings.models.PlaceTypePrice.objects" />
+          <option value="site_settings.models.PlaceType.objects" />
+          <option value="site_settings.models.PlaceType.id" />
+          <option value="resident.models.ResidentVisitedDay.resident_id" />
+          <option value="product.models.Manufacturer.objects" />
+          <option value="product.models.Product.objects" />
+          <option value="product.models.Niche.objects" />
+          <option value="niche.models.Niche.objects" />
+          <option value="manufacturer.models.Manufacturer.objects" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

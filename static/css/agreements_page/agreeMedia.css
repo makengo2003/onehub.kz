@@ -1,0 +1,62 @@
+@media (max-width: 990px){
+	.navbar{
+		margin-bottom: 50px;
+	}
+
+	.down_block{
+		margin-left: 0;
+		width: fit-content;
+		flex-direction: row;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.main_price_block{
+		margin: 30px auto;
+	}
+
+	.menu__btn{
+		top: 20px;
+	}
+
+	.download{
+		margin-top: 0;
+		margin-left: 20px;
+	}
+
+	.download a{
+		padding: 7.5px 15px;
+	}
+
+	.title_agree{
+		margin-top: 30px;
+	}
+
+	.container{
+		margin-top: 10px;
+	}
+}
+
+@media (max-width: 560px){
+	p{
+		font-size: 18px;
+	}
+
+	.title_agree b{
+		font-size: 18px;
+	}
+
+	.download{
+		margin-left: auto;
+	}
+}
+
+@media (max-width: 400px){
+	p{
+		font-size: 16px;
+	}
+
+	.title_agree b{
+		font-size: 16px;
+	}
+}

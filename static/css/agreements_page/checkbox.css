@@ -1,0 +1,56 @@
+.checkbox{
+  display: flex;
+  --width: 50px;
+  --height: 25px;
+  --offset: 1px;
+  --duration: 0.3s;
+  cursor: pointer;
+}
+
+.checkbox:hover{
+  filter: brightness(1.2);
+}
+
+.checkbox_div{
+  position: relative;
+  width: var(--width);
+  height: var(--height);
+  border-radius: var(--width);
+  border:0.7px solid;
+  border-color: black;
+  background-image: url(rus1.jpg);
+  background-size: contain;
+  transition: var(--duration);
+}
+
+.checkbox_input {
+  display: none;
+}
+
+.checkbox_input:checked ~ .checkbox_div {
+  background-image: url(kaz1.jpg);
+  background-size: contain;
+}
+
+.checkbox_input:checked ~ .checkbox_div::before {
+  background-image: url(kaz2.jpg);
+  background-size: contain;
+  /* border: solid; */
+  border-color: black;
+  left: calc(var(--width) - var(--height) + var(--offset));
+}
+
+.checkbox_div::before {
+  content: '';
+  position: absolute;
+  top: var(--offset);
+  left: var(--offset);
+  width: calc(var(--height) - 2 * var(--offset));
+  height: calc(var(--height) - 2 * var(--offset));
+  background-image: url(rus2.jpg);
+  background-size: contain;
+  border:0,7px solid;
+  border-color: black;
+  border-radius: 50%;
+  transition: var(--duration);
+}

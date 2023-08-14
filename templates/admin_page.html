@@ -1,0 +1,1478 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+<head>
+    <title>OneHub Admin Page</title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <link rel="stylesheet" href="{% static 'css/admin_page/panel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_page/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_page/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_page/zatemnenie.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_page/price.css' %}">
+
+    <style>
+        .period_selects button {
+            display: block;
+            margin-left: 20px;
+            background-color: green;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold
+        }
+
+        .finish {
+            margin-left: 20px;
+        }
+
+        .analityc_block summary {
+            padding: 10px;
+        }
+
+        canvas{
+            max-height: 300px;
+        }
+
+        .text_info{
+            margin: 10px 20px;
+        }
+
+        .rejects, .residents_professions{
+            border-top: 1px solid black;
+            margin-top: 30px;
+        }
+
+        .requests_text_info ul{
+            padding: 0;
+        }
+
+        .requests_text_info li{
+            list-style: none;
+            display: flex;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .requests_text_info li p{
+            margin: 0;
+        }
+
+        .requests_text_info li:before{
+            content: '✪';
+            margin-right: 5px;
+            margin-top: -3px;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="vertical_menu">
+        <div class="logo bblock">
+            <img src="{% static 'imgs/admin_page/oneHub.png' %}" alt="">
+        </div>
+
+        <div class="user_name bblock">
+            <b id="request_user_username">{{ request.user.username }}</b>
+        </div>
+
+        <div class="sections bblock">
+            <div class="section">
+                <input type="radio" name="sections" id="sidebar_main_section_app_choose_btn" onclick="open_section('main_section_app')">
+                <label for="sidebar_main_section_app_choose_btn"><img src="{% static 'imgs/admin_page/home.png' %}">Главная</label>
+            </div>
+
+            <div class="section">
+                <input type="radio" name="sections" id="sidebar_site_settings_section_app_choose_btn" onclick="open_section('site_settings_section_app')">
+                <label for="sidebar_site_settings_section_app_choose_btn"><img src="{% static 'imgs/admin_page/settings.png' %}">Настройки сайта</label>
+            </div>
+
+            {% if request.user.is_superuser %}
+            <div class="section">
+                <input type="radio" name="sections" id="sidebar_analytics_section_choose_btn" onclick="open_section('analytics_section')">
+                <label for="sidebar_analytics_section_choose_btn"><img src="{% static 'imgs/admin_page/analytics.png' %}">Аналитика</label>
+            </div>
+
+            <div class="section">
+                <input type="radio" name="sections" id="sidebar_admin_actions_section_choose_btn" onclick="open_section('admin_actions_section')">
+                <label for="sidebar_admin_actions_section_choose_btn"><img src="{% static 'imgs/admin_page/admin_actions_history.png' %}">Action Log</label>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="exit">
+            <button type="button" onclick="window.location.href = '{% url 'logout' %}'">Выйти</button>
+        </div>
+    </div>
+
+    <div class="container main_con" id="main_section_app" style="display: none;">
+        <form class="search_block" @submit.prevent="search">
+            <input type="text" name="search_text" v-model="search_input">
+            <input type="submit" value="Поиск" style="cursor: pointer;">
+
+            <button type="button" @click="open_add_form">Добавить</button>
+            {% if request.user.is_superuser %}
+            <button type="button" @click="export_to_excel(['{% url 'export_to_excel_2months' %}', '{% url 'export_to_excel_daily' %}'])">Экспорт данные в Excel</button>
+            {% endif %}
+        </form>
+
+
+        <div class="choose_section">
+            <button onclick="open_subsection('residents_list')" id="residents_list_choose_section_btn" value="0">Резиденты</button>
+            <button onclick="open_subsection('booked_places_list')" id="booked_places_list_choose_section_btn" value="0">Забронированные</button>
+            <button style="margin-right: 5px" onclick="open_subsection('booking_requests_list')" id="booking_requests_list_choose_section_btn" value="0">Запросы</button>
+            <p :style="[new_booking_requests_count > 0 ? {visibility: 'initial', marginRight: '25px'} : {visibility: 'hidden', marginRight: '5px'}]">${new_booking_requests_count}</p>
+            <button onclick="open_subsection('deleted_residents_list')" id="deleted_residents_list_choose_section_btn" value="0">Удаленные Резиденты</button>
+            <button onclick="open_subsection('deleted_booked_places_list')" id="deleted_booked_places_list_choose_section_btn" value="0">Удаленные Забронированные</button>
+        </div>
+
+
+        <div id="add-zatemnenie">
+            <div class="extend_block">
+                <div class="select_which_one_add" v-if="add_booked_place_form.booking_request_id == 0 && add_resident_form.booked_place_id == 0">
+                    <p>Добавить</p>
+                    <div class="which_one_add">
+                        <input required id="add_booked_place" type="radio" name="which_one_add" v-model="which_one_add" class="add_checkbox" value="booked_place">
+                        <label for="add_booked_place">Забронированное место</label>
+                    </div>
+                    <div class="which_one_add">
+                        <input required id="add_resident" type="radio" name="which_one_add" v-model="which_one_add" class="add_checkbox" value="resident">
+                        <label for="add_resident">Резидент</label>
+                    </div>
+                </div>
+
+                <form @submit.prevent="submit_add_booked_place_form" v-if="which_one_add == 'booked_place'">
+                    {% csrf_token %}
+                    <h2 v-if="add_booked_place_form.booking_request_id != 0">Бронирования запроса №${ add_booked_place_form.booking_request_id }</h2>
+                    <div class="payment">
+                        <p>Вид оплаты</p>
+
+                        <div class="payment_type">
+                            <input id="cash_payment_type" name="payment_type"
+                                   type="radio" class="add_checkbox" value="cash" v-model="add_booked_place_form.payment_type">
+                            <label for="cash_payment_type">Наличный</label>
+                        </div>
+
+                        <div class="payment_type">
+                            <input id="cashless_payment_type" name="payment_type"
+                                   type="radio" class="add_checkbox" value="cashless" v-model="add_booked_place_form.payment_type">
+                            <label for="cashless_payment_type">Безналичный</label>
+                        </div>
+                    </div>
+
+                    <div class="FIO">
+                        <p>ФИО</p>
+
+                        <div class="FIO_input">
+                            <input style="margin-bottom: 5px;" required type="text" v-model="add_booked_place_form.consumer_fullname">
+                            <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="booking_search_by_fullname">Поиск по имени</h5>
+                        </div>
+                    </div>
+
+                    <div style="display: flex">
+                        <div class="consumer_phone_number">
+                            <p>Номер телефона</p>
+                            <input style="margin-bottom: 5px;" required type="text" v-model="add_booked_place_form.consumer_phone_number">
+                            <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="booking_search_by_phone_number">Поиск по номеру телефона</h5>
+                        </div>
+                        <div style="margin-left: 40px" class="time_type">
+                            <p>Время дня</p>
+                            <select required v-model="add_booked_place_form.time_type">
+                                <option value="daytime">День</option>
+                                <option value="nighttime">Ночь</option>
+                                <option value="day">Сутки</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="period_duration">
+                        <div class="booked_period_starts_at">
+                            <p>Начиная с</p>
+                            <input type="datetime-local" required v-model="add_booked_place_form.starts_at">
+                        </div>
+                        <div class="number_of_place" style="margin-left: 40px">
+                            <p>Номер места</p>
+                            <input type="text" v-model="add_booked_place_form.number">
+                        </div>
+                    </div>
+
+                    <div class="place_info">
+                        <div class="duration">
+                            <p>Длительность</p>
+
+                            <input required type="number" v-model="add_booked_place_form.duration">
+                        </div>
+
+                        <div style="margin-left: 40px;" class="period">
+                            <p>Срок</p>
+
+                            <select required v-model="add_booked_place_form.term">
+                                {% for term in terms %}
+                                    <option value="{{ term.0 }}">{{ term.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="type_of_place" style="display: flex">
+                        <div>
+                            <p>Тип места</p>
+
+                            <select required v-model="add_booked_place_form.type">
+                                <option v-for="place_type in place_types" :value="place_type">${ place_type }</option>
+                            </select>
+                        </div>
+                        <div style="margin-left: 40px;" class="deposit">
+                            <p>Депозит</p>
+
+                            <input type="number" v-model="add_booked_place_form.deposit" required style="width: 116px;">
+                        </div>
+                    </div>
+
+                    <div class="add_btn">
+                        <button type="submit">Добавить</button>
+                    </div>
+                </form>
+
+
+                <form @submit.prevent="submit_add_resident_form" v-else>
+                    {% csrf_token %}
+                    <h2 v-if="add_resident_form.booked_place_id != 0">Сделать резидентом №${ add_resident_form.booked_place_id } бронирования</h2>
+                    <div class="payment">
+                        <p>Вид оплаты</p>
+
+                        <div class="payment_type">
+                            <input id="resident_cash_payment_type" name="payment_type"
+                                   type="radio" class="add_checkbox" value="cash" v-model="add_resident_form.payment_type">
+                            <label for="resident_cash_payment_type">Наличный</label>
+                        </div>
+
+                        <div class="payment_type">
+                            <input id="resident_cashless_payment_type" name="payment_type"
+                                   type="radio" class="add_checkbox" value="cashless" v-model="add_resident_form.payment_type">
+                            <label for="resident_cashless_payment_type">Безналичный</label>
+                        </div>
+
+                        <div class="payment_type">
+                            <input id="resident_barter_payment_type" name="payment_type"
+                                   type="radio" class="add_checkbox" value="barter" v-model="add_resident_form.payment_type">
+                            <label for="resident_barter_payment_type">Бартер</label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex">
+                        <div class="FIO">
+                            <p>ФИО</p>
+
+                            <div class="FIO_input">
+                                <input style="margin-bottom: 5px" required type="text" v-model="add_resident_form.fullname">
+                                <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="resident_search_by_fullname">Поиск по имени</h5>
+                            </div>
+                        </div>
+                        <div class="consumers_activity" style="margin-left: 39px;">
+                            <p style="font-size: 17px; margin-left: -25px;">Вид деятельности</p>
+
+                            <div class="consumers_activity_input">
+                              <input type="text" style="width: 120px; margin-top: 3px" required v-model="add_resident_form.profession">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex">
+                        <div class="consumer_phone_number">
+                            <p>Номер телефона</p>
+                            <input style="margin-bottom: 5px" required type="text" v-model="add_resident_form.phone_number">
+                            <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="resident_search_by_phone_number">Поиск по номеру телефона</h5>
+                        </div>
+                        <div style="margin-left: 40px" class="time_type">
+                            <p>Время дня</p>
+                            <select required v-model="add_resident_form.time_type" @change="add_resident_form.submit_function = 'calculate_price'">
+                                <option value="daytime">День</option>
+                                <option value="nighttime">Ночь</option>
+                                <option value="day">Сутки</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="period_duration">
+                        <div class="booked_period_starts_at">
+                            <p>Начиная с</p>
+                            <input type="datetime-local" required v-model="add_resident_form.starts_at">
+                        </div>
+                        <div class="number_of_place" style="margin-left: 40px">
+                            <p>Номер места</p>
+                            <input type="text" v-model="add_resident_form.place_number">
+                        </div>
+                    </div>
+
+                    <div class="place_info">
+                        <div class="duration">
+                            <p>Длительность</p>
+
+                            <input required type="number" v-model="add_resident_form.duration" @change="add_resident_form.submit_function = 'calculate_price'">
+                        </div>
+
+                        <div style="margin-left: 40px;" class="period">
+                            <p>Срок</p>
+
+                            <select required v-model="add_resident_form.term" @change="add_resident_form.submit_function = 'calculate_price'">
+                                {% for term in terms %}
+                                    <option value="{{ term.0 }}">{{ term.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="type_of_place" style="display: flex">
+                        <div>
+                            <p>Тип места</p>
+
+                            <select required v-model="add_resident_form.place_type" @change="add_resident_form.submit_function = 'calculate_price'">
+                                <option v-for="place_type in place_types" :value="place_type">${ place_type }</option>
+                            </select>
+                        </div>
+                        <div style="margin-left: 40px;" class="discount_for_place">
+                            <p>Скидка</p>
+
+                            <input type="number" v-model="add_resident_form.used_discount" required @change="add_resident_form.submit_function = 'calculate_price'">
+                        </div>
+                    </div>
+
+                    <p>Счет к оплате: ${ add_resident_form.price }</p>
+
+                    <div class="add_btn">
+                        <button type="submit" v-if="add_resident_form.submit_function == 'calculate_price'">Посчитать счет</button>
+                        <button type="submit" v-else>Добавить</button>
+                    </div>
+                </form>
+
+
+                <div class="close">
+                    <a href="#"><img src="{% static 'imgs/admin_page/close.png' %}" alt=""></a>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="section_residents_list" style="display: none;">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p @click="residents_order_by('fullname')">
+                        ФИО
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'fullname'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-fullname'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="phone_number">
+                    <p>Номер телефона</p>
+                </div>
+                <div class="place">
+                    <p @click="residents_order_by('place_number')">
+                        Место
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'place_number'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-place_number'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="placeType">
+                    <p @click="residents_order_by('place_type')">
+                        Тип места
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'place_type'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-place_type'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="date">
+                    <p @click="residents_order_by('expires_at')">
+                        Дата просрочки
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'expires_at'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-expires_at'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="visited_today" style="margin: initial;">
+                    <p @click="residents_order_by('visited_today')">
+                        Сегодня посещал
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'visited_today'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-visited_today'"><b>↓</b></span>
+                    </p>
+                </div>
+            </div>
+
+            <div id="residents_list">
+                <div v-for="(resident, index) in residents" class="clients_info_block" :key="index">
+                    <div class="clients_info">
+                        <div class="number">
+                            <p>${ index + 1 }</p>
+                        </div>
+                        <div class="name">
+                            <p @click="open_resident_details_window(resident)" style="color: blue;">${ resident.fullname }</p>
+                        </div>
+                        <div class="phone_number">
+                            <p>${ resident.phone_number }</p>
+                        </div>
+                        <div class="place">
+                            <p>${ resident.place_number }</p>
+                        </div>
+                        <div class="placeType">
+                            <p>${ resident.place_type }</p>
+                        </div>
+                        <div class="date">
+                            <p v-if="resident.status == 'active'">${ resident.starts_at } --- ${ resident.expires_at }</p>
+                            <p v-else style="color: red">${ resident.starts_at } --- ${ resident.expires_at }</p>
+                        </div>
+                        <div class="visited_today">
+                            <input style="cursor: pointer;" type="checkbox" class="visited_today_checkbox" v-model="resident.visited_today" @change="update_resident_visited_today_status(resident.id)">
+                        </div>
+                        <div class="time_type">
+
+                            <img src="{% static 'imgs/admin_page/daytime.jpg' %}" v-if="resident.time_type == 'daytime'">
+                            <img src="{% static 'imgs/admin_page/nighttime.jpg' %}" v-else-if="resident.time_type == 'nighttime'">
+                            <img src="{% static 'imgs/admin_page/day.jpg' %}" v-else>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resident_details_window">
+                <div v-if="current_opened_resident" class="side-panel">
+                    <a class="side-button-2" href="#" style="text-decoration: none;">+</a>
+                    <div class="side_info">
+                      <b>Создано:</b><span>${ current_opened_resident.created_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>ФИО:</b><input type="text" style="width: 292px" :disabled="!editable_resident_fields.fullname.enabled" v-model="current_opened_resident.fullname">
+                      <div class="side_info_edit">
+                        <button @click="enable_resident_field(editable_resident_fields.fullname, current_opened_resident.fullname)" v-if="!editable_resident_fields.fullname.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_resident_info(current_opened_resident, 'fullname', current_opened_resident.fullname)" class="edit_accept">☑️</button>
+                          <button @click="cancel_resident_field_editing('fullname')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Номер телефона:</b><input type="text" :disabled="!editable_resident_fields.phone_number.enabled" v-model="current_opened_resident.phone_number">
+                      <div class="side_info_edit">
+                        <button @click="enable_resident_field(editable_resident_fields.phone_number, current_opened_resident.phone_number)" v-if="!editable_resident_fields.phone_number.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_resident_info(current_opened_resident, 'phone_number', current_opened_resident.phone_number)" class="edit_accept">☑️</button>
+                          <button @click="cancel_resident_field_editing('phone_number')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Вид деятельности:</b><input type="text" style="width: 168px;" :disabled="!editable_resident_fields.profession.enabled" v-model="current_opened_resident.profession">
+                      <div class="side_info_edit">
+                        <button @click="enable_resident_field(editable_resident_fields.profession, current_opened_resident.profession)" v-if="!editable_resident_fields.profession.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_resident_info(current_opened_resident, 'profession', current_opened_resident.profession)" class="edit_accept">☑️</button>
+                          <button @click="cancel_resident_field_editing('profession')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Цена:</b><span>${ current_opened_resident.price } тг</span>
+                    </div>
+                    <div class="side_info">
+                        <b>Тип оплаты:</b><span>${ current_opened_resident.payment_type_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Скидка:</b><span>${ current_opened_resident.used_discount } %</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Кол бумаги:</b><input type="number" :disabled="!editable_resident_fields.paper_count.enabled" v-model="current_opened_resident.paper_count">
+                      <div class="side_info_edit">
+                        <button @click="enable_resident_field(editable_resident_fields.paper_count, current_opened_resident.paper_count)" v-if="!editable_resident_fields.paper_count.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_resident_info(current_opened_resident, 'paper_count', current_opened_resident.paper_count)" class="edit_accept">☑️</button>
+                          <button @click="cancel_resident_field_editing('paper_count')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Длительность:</b><span>${ current_opened_resident.duration }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Срок:</b>
+                      <span>${ current_opened_resident.term_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Время дня:</b>
+                      <span>${ current_opened_resident.time_type_text() }</span>
+                    </div>
+                    <div class="side_btns">
+                      <button class="extend" @click="open_renew_resident_form(current_opened_resident)">Продлить</button>
+                      <button class="delete" @click="delete_resident(current_opened_resident)">Удалить</button>
+                    </div>
+                    <div class="side_btns">
+                      <button class="extend" @click="repeat_order(current_opened_resident)">Повторить заказ</button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="renew_resident-zatemnenie" @submit.prevent="submit_renew_resident_form">
+                {% csrf_token %}
+                <div class="extend_block">
+                    <div style="display: flex">
+                        <div class="payment">
+                            <p>Вид оплаты</p>
+
+                            <div class="payment_type">
+                                <input id="resident_renew_cash_payment_type" name="payment_type"
+                                       type="radio" class="add_checkbox" value="cash" v-model="renew_resident_form.payment_type">
+                                <label for="resident_renew_cash_payment_type">Наличный</label>
+                            </div>
+
+                            <div class="payment_type">
+                                <input id="resident_renew_cashless_payment_type" name="payment_type"
+                                       type="radio" class="add_checkbox" value="cashless" v-model="renew_resident_form.payment_type">
+                                <label for="resident_renew_cashless_payment_type">Безналичный</label>
+                            </div>
+
+                            <div class="payment_type">
+                                <input id="resident_renew_barter_payment_type" name="payment_type"
+                                       type="radio" class="add_checkbox" value="barter" v-model="renew_resident_form.payment_type">
+                                <label for="resident_renew_barter_payment_type">Бартер</label>
+                            </div>
+                        </div>
+                        <div style="margin-left: 127px;" class="discount_for_place">
+                            <p>Скидка</p>
+
+                            <input required type="number" v-model="renew_resident_form.used_discount" @change="renew_resident_form.submit_function = 'calculate_price'">
+                        </div>
+                    </div>
+
+
+                    <div class="place_info">
+                        <div class="duration">
+                            <p style="font-size: 18px">Длительность</p>
+
+                            <input style="width: 115px" required type="number" v-model="renew_resident_form.duration" @change="renew_resident_form.submit_function = 'calculate_price'">
+                        </div>
+
+                        <div style="margin-left: 27px;" class="period">
+                            <p style="font-size: 18px;">Срок</p>
+
+                            <select style="width: 115px" required v-model="renew_resident_form.term" @change="renew_resident_form.submit_function = 'calculate_price'">
+                                {% for term in terms %}
+                                    <option value="{{ term.0 }}">{{ term.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="time_type" style="margin-left: 27px;">
+                            <p style="font-size: 18px">Время дня</p>
+                            <select style="width: 100px" required v-model="renew_resident_form.time_type" @change="renew_resident_form.submit_function = 'calculate_price'">
+                                <option value="daytime">День</option>
+                                <option value="nighttime">Ночь</option>
+                                <option value="day">Сутки</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+
+                    <div class="price">
+                        <p style="margin-bottom: 15px;">Счет к оплате: ${ renew_resident_form.price } тг</p>
+                    </div>
+
+                    <div class="add_btn">
+                        <button type="submit" v-if="renew_resident_form.submit_function == 'calculate_price'">Посчитать счет</button>
+                        <button type="submit" v-else>Продлить</button>
+                    </div>
+
+                    <div class="close">
+                        <a href="#"><img src="{% static 'imgs/admin_page/close.png' %}" alt=""></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div id="section_deleted_residents_list" style="display: none">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p>ФИО</p>
+                </div>
+                <div class="phone_number">
+                    <p>Номер телефона</p>
+                </div>
+                <div class="place">
+                    <p>Место</p>
+                </div>
+                <div class="placeType">
+                    <p>Тип места</p>
+                </div>
+                <div class="date">
+                    <p>Дата просрочки</p>
+                </div>
+                <div class="time_type" style="min-width: 46px;">
+                    
+                </div>
+            </div>
+
+            <div id="deleted_residents_list">
+                <div v-for="(deleted_resident, index) in deleted_residents" class="clients_info_block" :key="index">
+                    <div class="clients_info">
+                        <div class="number">
+                            <p>${ index + 1 }</p>
+                        </div>
+                        <div class="name">
+                            <p @click="open_deleted_resident_details_window(deleted_resident)" style="color: blue">${ deleted_resident.fullname }</p>
+                        </div>
+                        <div class="phone_number">
+                            <p>${ deleted_resident.phone_number }</p>
+                        </div>
+                        <div class="place">
+                            <p>${ deleted_resident.place_number }</p>
+                        </div>
+                        <div class="placeType">
+                            <p>${ deleted_resident.place_type }</p>
+                        </div>
+                        <div class="date">
+                            <p>${ deleted_resident.starts_at } --- ${ deleted_resident.expires_at }</p>
+                        </div>
+                        <div class="time_type">
+
+                            <img src="{% static 'imgs/admin_page/daytime.jpg' %}" v-if="deleted_resident.time_type == 'daytime'">
+                            <img src="{% static 'imgs/admin_page/nighttime.jpg' %}" v-else-if="deleted_resident.time_type == 'nighttime'">
+                            <img src="{% static 'imgs/admin_page/day.jpg' %}" v-else>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deleted_resident_details_window">
+                <div v-if="current_opened_deleted_resident" class="side-panel">
+                    <a class="side-button-2" href="#" style="text-decoration: none;">+</a>
+                    <div class="side_info">
+                      <b>Создано:</b><span>${ current_opened_deleted_resident.created_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Удалено:</b><span>${ current_opened_deleted_resident.deleted_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>ФИО:</b><span>${ current_opened_deleted_resident.fullname }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Номер телефона:</b><span>${ current_opened_deleted_resident.phone_number }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Вид деятельности:</b><span>${ current_opened_deleted_resident.profession }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Цена:</b><span>${ current_opened_deleted_resident.price } тг</span>
+                    </div>
+                    <div class="side_info">
+                        <b>Тип оплаты:</b><span>${ current_opened_deleted_resident.payment_type_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Скидка:</b><span>${ current_opened_deleted_resident.used_discount } %</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Кол бумаги:</b><span>${ current_opened_deleted_resident.paper_count }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Длительность:</b><span>${ current_opened_deleted_resident.duration }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Срок:</b>
+                      <span>${ current_opened_deleted_resident.term_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Время дня:</b>
+                      <span>${ current_opened_deleted_resident.time_type_text() }</span>
+                    </div>
+                    <div class="side_btns">
+                      <button class="extend" @click="repeat_order(current_opened_deleted_resident)">Повторить заказ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="section_deleted_booked_places_list" style="display: none">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p>ФИО</p>
+                </div>
+                <div class="phone_number">
+                    <p>Номер телефона</p>
+                </div>
+                <div class="place">
+                    <p>Место</p>
+                </div>
+                <div class="placeType">
+                    <p>Тип места</p>
+                </div>
+                <div class="date">
+                    <p>Дата просрочки</p>
+                </div>
+                <div class="deposit_is_paid" style="margin: initial;">
+                    <p>Депозит оплачен</p>
+                </div>
+            </div>
+
+            <div id="deleted_booked_places_list">
+                <div v-for="(deleted_booked_place, index) in deleted_booked_places" class="clients_info_block" :key="index">
+                    <div class="clients_info">
+                        <div class="number">
+                            <p>${ index + 1 }</p>
+                        </div>
+                        <div class="name">
+                            <p @click="open_deleted_booked_place_details_window(deleted_booked_place)" style="color: blue">${ deleted_booked_place.consumer_fullname }</p>
+                        </div>
+                        <div class="phone_number">
+                            <p>${ deleted_booked_place.consumer_phone_number }</p>
+                        </div>
+                        <div class="place">
+                            <p>${ deleted_booked_place.number }</p>
+                        </div>
+                        <div class="placeType">
+                            <p>${ deleted_booked_place.type }</p>
+                        </div>
+                        <div class="date">
+                            <p>${ deleted_booked_place.starts_at } --- ${ deleted_booked_place.expires_at }</p>
+                        </div>
+                        <div class="deposit_is_paid">
+                            <input style="cursor: pointer;" type="checkbox" class="visited_today_checkbox" :checked="deleted_booked_place.is_paid" disabled>
+                        </div>
+                        <div class="time_type">
+
+                            <img src="{% static 'imgs/admin_page/daytime.jpg' %}" v-if="deleted_booked_place.time_type == 'daytime'">
+                            <img src="{% static 'imgs/admin_page/nighttime.jpg' %}" v-else-if="deleted_booked_place.time_type == 'nighttime'">
+                            <img src="{% static 'imgs/admin_page/day.jpg' %}" v-else>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deleted_booked_place_details_window">
+                <div v-if="current_opened_deleted_booked_place" class="side-panel">
+                    <a class="side-button-2" href="#" style="text-decoration: none;">+</a>
+                    <div class="side_info">
+                      <b>Создано:</b><span>${ current_opened_deleted_booked_place.created_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Удалено:</b><span>${ current_opened_deleted_booked_place.deleted_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>ФИО:</b><span>${ current_opened_deleted_booked_place.consumer_fullname }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Номер телефона:</b><span>${ current_opened_deleted_booked_place.consumer_phone_number }</span>
+                    </div>
+                    <div class="side_info">
+                        <b>Тип оплаты:</b><span>${ current_opened_deleted_booked_place.payment_type_text() }</span>
+                    </div>
+                    <div class="side_info">
+                        <b>Депозит:</b><span>${ current_opened_deleted_booked_place.deposit }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Длительность:</b><span>${ current_opened_deleted_booked_place.duration }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Срок:</b>
+                      <span>${ current_opened_deleted_booked_place.term_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Время дня:</b>
+                      <span>${ current_opened_deleted_booked_place.time_type_text() }</span>
+                    </div>
+                    <div class="side_btns">
+                      <button class="extend" @click="repeat_order(current_opened_deleted_booked_place)">Повторить заказ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="section_booked_places_list" style="display: none;">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p @click="booked_places_order_by('consumer_fullname')">
+                        ФИО
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'consumer_fullname'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-consumer_fullname'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="phone_number">
+                    <p>Номер телефона</p>
+                </div>
+                <div class="place">
+                    <p @click="booked_places_order_by('number')">
+                        Место
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'number'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-number'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="placeType">
+                    <p @click="booked_places_order_by('type')">
+                        Тип места
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'type'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-type'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="date">
+                    <p @click="booked_places_order_by('expires_at')">
+                        Дата просрочки
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'expires_at'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-expires_at'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="deposit_is_paid" style="margin: initial;">
+                    <p @click="booked_places_order_by('is_paid')">
+                        Депозит оплачен
+                        <span style="font-size: 17px" v-if="booked_places_order_by_column == 'is_paid'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="booked_places_order_by_column == '-is_paid'"><b>↓</b></span>
+                    </p>
+                </div>
+            </div>
+
+            <div id="booked_places_list">
+                <div v-for="(booked_place, index) in booked_places" class="clients_info_block" :key="index">
+                    <div class="clients_info">
+                        <div class="number">
+                            <p>${ index + 1 }</p>
+                        </div>
+                        <div class="name">
+                            <p style="color: blue" @click="open_booked_place_details_window(booked_place)">${ booked_place.consumer_fullname }</p>
+                        </div>
+                        <div class="phone_number">
+                            <p>${ booked_place.consumer_phone_number }</p>
+                        </div>
+                        <div class="place">
+                            <p>${ booked_place.number }</p>
+                        </div>
+                        <div class="placeType">
+                            <p>${ booked_place.type }</p>
+                        </div>
+                        <div class="date">
+                            <p v-if="booked_place.status == 'active'">${ booked_place.starts_at } --- ${ booked_place.expires_at }</p>
+                            <p v-else style="color: red">${ booked_place.starts_at } --- ${ booked_place.expires_at }</p>
+                        </div>
+                        <div class="deposit_is_paid">
+                            <input style="cursor: pointer;" type="checkbox" class="visited_today_checkbox" v-model="booked_place.is_paid" @change="update_booked_place_info(booked_place, 'is_paid', booked_place.is_paid)">
+                        </div>
+                        <div class="time_type">
+
+                            <img src="{% static 'imgs/admin_page/daytime.jpg' %}" v-if="booked_place.time_type == 'daytime'">
+                            <img src="{% static 'imgs/admin_page/nighttime.jpg' %}" v-else-if="booked_place.time_type == 'nighttime'">
+                            <img src="{% static 'imgs/admin_page/day.jpg' %}" v-else>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="booked_place_details_window">
+                <div v-if="current_opened_booked_place" class="side-panel">
+                    <a class="side-button-2" href="#" style="text-decoration: none;">+</a>
+                    <div class="side_info">
+                      <b>Создано:</b><span>${ current_opened_booked_place.created_at }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>ФИО:</b><input type="text" style="width: 292px" :disabled="!editable_booked_place_fields.consumer_fullname.enabled" v-model="current_opened_booked_place.consumer_fullname">
+                      <div class="side_info_edit">
+                        <button @click="enable_booked_place_field(editable_booked_place_fields.consumer_fullname, current_opened_booked_place.consumer_fullname)" v-if="!editable_booked_place_fields.consumer_fullname.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_booked_place_info(current_opened_booked_place, 'consumer_fullname', current_opened_booked_place.consumer_fullname)" class="edit_accept">☑️</button>
+                          <button @click="cancel_booked_place_field_editing('consumer_fullname')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Номер телефона:</b><input type="text" :disabled="!editable_booked_place_fields.consumer_phone_number.enabled" v-model="current_opened_booked_place.consumer_phone_number">
+                      <div class="side_info_edit">
+                        <button @click="enable_booked_place_field(editable_booked_place_fields.consumer_phone_number, current_opened_booked_place.consumer_phone_number)" v-if="!editable_booked_place_fields.consumer_phone_number.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_booked_place_info(current_opened_booked_place, 'consumer_phone_number', current_opened_booked_place.consumer_phone_number)" class="edit_accept">☑️</button>
+                          <button @click="cancel_booked_place_field_editing('consumer_phone_number')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                        <b>Тип оплаты:</b><span>${ current_opened_booked_place.payment_type_text() }</span>
+                    </div>
+                    <div class="side_info">
+                        <b>Депозит:</b><span>${ current_opened_booked_place.deposit } тг</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Длительность:</b><span>${ current_opened_booked_place.duration }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Срок:</b>
+                      <span>${ current_opened_booked_place.term_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Время дня:</b>
+                      <span>${ current_opened_booked_place.time_type_text() }</span>
+                    </div>
+                    <div class="side_btns">
+                        <button class="extend" @click="from_booked_place_to_resident(current_opened_booked_place)">Сделать резидентом</button>
+                    </div>
+                    <div class="side_btns">
+                        <button class="extend" @click="open_renew_booked_place_form(current_opened_booked_place)">Продлить</button>
+                        <button class="delete" @click="delete_booked_place(current_opened_booked_place)">Удалить</button>
+                    </div>
+                    <div class="side_btns">
+                      <button class="extend" @click="repeat_order(current_opened_booked_place)">Повторить заказ</button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="renew_booked_place-zatemnenie" @submit.prevent="submit_renew_booked_place_form">
+                {% csrf_token %}
+                <div class="extend_block">
+                    <div class="place_info">
+                        <div class="duration">
+                            <p style="font-size: 18px">Длительность</p>
+
+                            <input style="width: 115px" required type="number" v-model="renew_booked_place_form.duration">
+                        </div>
+
+                        <div style="margin-left: 27px;" class="period">
+                            <p style="font-size: 18px">Срок</p>
+
+                            <select style="width: 115px" required v-model="renew_booked_place_form.term">
+                                {% for term in terms %}
+                                    <option value="{{ term.0 }}">{{ term.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div style="margin-left: 27px" class="time_type">
+                            <p style="font-size: 18px">Время дня</p>
+                            <select style="width: 100px" required v-model="renew_booked_place_form.time_type">
+                                <option value="daytime">День</option>
+                                <option value="nighttime">Ночь</option>
+                                <option value="day">Сутки</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="add_btn">
+                        <button type="submit">Продлить</button>
+                    </div>
+
+                    <div class="close" style="right: 13px; top: 13px;">
+                        <a href="#"><img src="{% static 'imgs/admin_page/close.png' %}" alt=""></a>
+                    </div>
+                </div>
+            </form>
+       </div>
+
+
+        <div id="section_booking_requests_list" style="display: none;">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p>ФИО</p>
+                </div>
+                <div class="phone_number">
+                    <p>Номер телефона</p>
+                </div>
+                <div class="placeType">
+                    <p>Тип места</p>
+                </div>
+                <div class="created_at">
+                    <p>Создано</p>
+                </div>
+                <div class="answered_at">
+                    <p>Принято</p>
+                </div>
+                <div class="extend_btns">
+                    
+                </div>
+            </div>
+
+            <div id="booking_requests_list">
+                <div class="clients_info_block" v-for="(booking_request, index) in booking_requests" style="display: flex" :key="index">
+                    <div class="number">
+                        <p>${ index + 1}</p>
+                    </div>
+                    <div class="name">
+                        <p>${ booking_request.consumer_fullname }</p>
+                    </div>
+                    <div class="phone_number">
+                        <p>${ booking_request.consumer_phone_number }</p>
+                    </div>
+                    <div class="placeType">
+                        <p>${ booking_request.place_type }</p>
+                    </div>
+                    <div class="created_at">
+                        <p>${ booking_request.created_at }</p>
+                    </div>
+                    <div class="answered_at">
+                        <p v-if="booking_request.is_accepted != null">${ booking_request.answered_at }</p>
+                        <p v-else>---</p>
+                    </div>
+                    <div v-if="booking_request.is_accepted != null" class="extend_btns">
+                        <span v-if="booking_request.is_accepted" style="color: green">Принято</span>
+                        <span v-else style="color: red">Отказано</span>
+                    </div>
+                    <div v-else style="display: flex; margin-right: 10px;">
+                        <button @click="from_booking_request_to_booked_place(booking_request)" class="accept_booking_request_btn">Принять</button>
+                        <button @click="open_booking_request_rejection_form(booking_request)" class="reject_booking_request_btn">Отказать</button>
+                    </div>
+                </div>
+            </div>
+
+            <form @submit.prevent="submit_booking_request_rejection_form" id="booking_request_rejection_form-zatemnenie">
+                <div class="extend_block">
+                  <h3 style="margin-top: 0">Причина отказа</h3>
+                  <textarea required v-model="booking_request_rejection_form.rejection_reason"></textarea>
+                  <input type="submit" value="Сохранить отменённым">
+
+                  <div class="close">
+                    <a href="#"><img src="{% static 'imgs/admin_page/close.png' %}" alt=""></a>
+                  </div>
+                </div>
+            </form>
+      </div>
+    </div>
+</div>
+
+
+<div id="login_change">
+    <form @submit.prevent="login_change_request()">
+        {% csrf_token %}
+        <div class="login_block">
+            <div class="close">
+                <a href="#">✖</a>
+            </div>
+
+            <h3 style="margin: 5px 0px 15px 0px">Изменить данные для входа в сайт</h3>
+
+            <div class="book_input">
+                <span>Имя пользователя</span>
+                <input type="text" v-model="form.username" required>
+            </div>
+
+            <div class="book_input">
+                <span>Старый пароль</span>
+                <input type="password" v-model="form.old_password" required>
+            </div>
+
+            <div class="book_input">
+                <span>Новый пароль</span>
+                <input type="password" v-model="form.new_password1" required>
+            </div>
+
+            <div class="book_input">
+                <span>Подтвердить пароль</span>
+                <input type="password" v-model="form.new_password2" required>
+            </div>
+
+            <ul class="book_input" style="padding-left: 20px;">
+                <li style="color: red" v-for="error in form.errors">${ error }</li>
+            </ul>
+
+            <div class="book_btn">
+               <button type="submit">Изменить</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div id="site_settings_section_app" class="container site_settings" style="display: none">
+    <div class="set_menu" id="set_menu">
+        <div class="set">
+            <button onclick="open_subsection('carousel_settings')">Изменить карусель</button>
+        </div>
+        {% if request.user.is_superuser %}
+        <div class="set">
+            <button onclick="open_subsection('booking_request_notification_emails_settings')">Эл. почты для оповещения новых запросов</button>
+        </div>
+        <div class="set">
+            <button onclick="open_subsection('prices_settings')">Тарифы</button>
+        </div>
+        {% endif %}
+        <div class="set">
+            <button onclick="window.location.hash = 'login_change'">Изменить данные для входа в сайт</button>
+        </div>
+    </div>
+
+    <div style="display: none" id="carousel_settings" class="carousel_block">
+        <p class="go_back_set_menu" onclick="open_subsection('set_menu')">< Назад</p>
+
+        <div class="carousel_f_block" id="carousel_images_preview_block">
+            <ol>
+                <li v-for="carousel_image in carousel_images">
+                    <a :href="carousel_image.url" target="_blank">${ carousel_image.name }</a>
+                </li>
+            </ol>
+
+            <div class="edit_carousel">
+                <button @click="open_carousel_images_editing_block" v-if="carousel_images.length != 0">Изменить</button>
+                <button @click="open_carousel_images_editing_block" v-else="">Добавить</button>
+            </div>
+        </div>
+
+        <div style="display: none" class="carousel_s_block" id="carousel_images_editing_block">
+            <div v-for="carousel_image in carousel_images" class="car_input"> <!-- draggable="true" -->
+                <span style="font-size: 25px; margin-right: 5px">⇳</span>
+                <input type="text" style="margin-right: 8px" v-model="carousel_image.name" required>
+                <input type="file" @change="handle_file_upload(carousel_image, $event)">
+                <button @click="delete_carousel_image(carousel_image)"><img src="{% static 'imgs/admin_page/trash.png' %}"></button>
+            </div>
+
+            <p @click="add_carousel_image" style="color: blue">Добавить фото</p>
+            <div class="edit_btns">
+                <button class="save" @click="save_carousel_images_editing">Сохранить</button>
+                <button class="back" @click="cancel_carousel_images_editing">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none" id="booking_request_notification_emails_settings" class="emails_block">
+        <p onclick="open_subsection('set_menu')" class="go_back_set_menu">< Назад</p>
+
+        <div class="emails">
+            <textarea cols="40" rows="10" :disabled="!is_editing" v-model="emails"></textarea>
+
+            <div class="edit_carousel" style="margin-top: 10px;" v-if="!is_editing">
+                <button @click="is_editing=true; emails_before_editing=emails">Изменить</button>
+            </div>
+            <div class="edit_btns" v-else>
+                <button class="save" @click="save_emails">Сохранить</button>
+                <button class="back" @click="cancel_emails_editing">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none" id="prices_settings" class="traffics">
+        <p onclick="open_subsection('set_menu')" class="go_back_set_menu">< Назад</p>
+
+        <div class="select_place" v-if="place_types.length > 0">
+            <span>Выберите тип места:</span>
+            <select v-model="selected_place_type" @change="get_prices_of_place_type">
+                <option v-for="place_type in place_types" :value="place_type">${ place_type.name }</option>
+            </select>
+        </div>
+
+        <p @click="add_new_place_type" class="add_new_place_type_text_btn">Добавить новый тип места</p>
+
+        <form @submit.prevent="submit_prices" class="main_price_block" v-if="selected_place_type != null">
+            <input class="place_type" required v-model="selected_place_type.name" :disabled="!is_editing">
+
+            <div class="row" style="width: 94.1%">
+                <div class="col top first">
+                    <span class="bold">Длительность</span>
+                </div>
+                <div class="col top second">
+                    <span class="bold">Срок</span>
+                </div>
+                <div class="col top third">
+                    <span class="bold">Время дня</span>
+                </div>
+                <div class="col top fourth">
+                    <span class="bold">Цена</span>
+                </div>
+            </div>
+            <div class="row" v-for="price in selected_place_type.prices" :style="[!is_editing ? {width: '94.1%'} : {width: '97.78%'}]">
+                <div class="col first">
+                    <input type="number" v-model="price.duration" :disabled="!is_editing" required>
+                </div>
+                <div class="col second">
+                    <select v-model="price.term" :disabled="!is_editing" required>
+                        {% for term in terms %}
+                            <option value="{{ term.0 }}">{{ term.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col third">
+                    <select v-model="price.time_type" :disabled="!is_editing" required>
+                        <option value="daytime">День</option>
+                        <option value="nighttime">Ночь</option>
+                        <option value="day">Сутки</option>
+                        <option value="anytime">В любое время</option>
+                    </select>
+                </div>
+                <div class="col fourth">
+                    <input type="number" v-model="price.price" :disabled="!is_editing" required>
+                </div>
+
+                <button type="button" v-if="is_editing" @click="delete_price(price)"><img height="20" src="{% static 'imgs/admin_page/trash.png' %}"></button>
+            </div>
+
+            <p @click="add_price" style="color: blue" v-if="is_editing">Добавить прайс</p>
+            <br v-else>
+
+            <div class="edit_btns" style="margin-bottom: 20px;" v-if="!is_editing">
+                <button class="save" @click="allow_price_editing">Изменить</button>
+                <button class="back" type="button" @click="delete_place_type">Удалить</button>
+            </div>
+            <div class="edit_btns" style="margin-bottom: 20px;" v-else>
+                <button class="save" type="submit">Сохранить</button>
+                <button class="back" type="button" @click="cancel_price_editing">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<div id="analytics_section" class="container analtics_page" style="display: none">
+  <form class="period_form" onsubmit="get_analytics(event)">
+      <b>Пероид</b>
+    <div class="period_selects">
+      <div class="period_select">
+          <span>С</span>
+        <input type="date" name="period_starts_at" required onchange="analytics_starts_at = this.value">
+      </div>
+
+      <div class="period_select finish">
+          <span>До</span>
+        <input type="date" name="period_finish_at" required onchange="analytics_ends_at = this.value">
+      </div>
+
+      <button type="submit">Получить аналитику</button>
+    </div>
+  </form>
+
+    <div id="analytics" style="display: none">
+        <div class="residents_analytic analityc_block">
+    <details>
+      <summary><img src="{% static 'imgs/admin_page/right_arrow.png' %}" class="right_arrow" alt="">Резиденты</summary>
+
+      <div class="charts">
+        <div class="chart">
+          <canvas id="residents_count"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_income"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_place_types"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_time_types"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_terms"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_income_grouped_by_payment_type"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_daytime_visiting"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_nighttime_visiting"></canvas>
+        </div>
+          <div class="chart">
+          <canvas id="residents_day_visiting"></canvas>
+        </div>
+      </div>
+
+        <div class="residents_professions text_info">
+            <h3>Общее количество часов посещения: <i id='total_visiting_hours'></i><i> ч.</i></h3>
+
+            <h3>Профессии резидентов</h3>
+            <div id="professions_list"></div>
+        </div>
+    </details>
+  </div>
+
+      <div class="booked_places_analytic analityc_block">
+
+        <details>
+          <summary><img src="{% static 'imgs/admin_page/right_arrow.png' %}" class="right_arrow" alt="">Забронированные места</summary>
+        <div class="charts">
+            <div class="chart">
+              <canvas id="booked_places_count"></canvas>
+            </div>
+            <div class="chart">
+              <canvas id="booked_places_deposits_line"></canvas>
+            </div>
+            <div class="chart">
+              <canvas id="booked_places_place_types"></canvas>
+            </div>
+            <div class="chart">
+              <canvas id="booked_places_time_types"></canvas>
+            </div>
+            <div class="chart">
+              <canvas id="booked_places_terms"></canvas>
+            </div>
+            <div class="chart">
+              <canvas id="booked_places_deposits_grouped_by_payment_type"></canvas>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="requests_analytic analityc_block">
+        <details>
+          <summary><img src="{% static 'imgs/admin_page/right_arrow.png' %}" class="right_arrow" alt="">Запросы</summary>
+
+            <div class="requests_text_info text_info">
+                <ul>
+                    <li><p>Общая кол. запросов: <span id="total_booking_requests_count"></span></p></li>
+                    <li><p>Мин. время отклика: <span id="min_response_time"></span> минуты</p></li>
+                    <li><p>Макс. время отклика: <span id="max_response_time"></span> минуты</p></li>
+                    <li><p>Сред. время отклика: <span id="avg_response_time"></span> минуты</p></li>
+                </ul>
+            </div>
+        <div class="charts">
+            <div class="chart">
+              <canvas id="booking_requests_count"></canvas>
+            </div>
+
+            <div class="chart">
+              <canvas id="booking_requests_place_types"></canvas>
+            </div>
+          </div>
+
+        <div class="rejects text_info">
+            <h3>Причины отказанных запросов</h3>
+            <div id="rejection_reasons_list"></div>
+        </div>
+        </details>
+      </div>
+    </div>
+</div>
+
+
+
+{% if request.user.is_superuser %}
+<div id="admin_actions_section" class="container analtics_page" style="display: none">
+  <form class="period_form" @submit.prevent="get_admin_actions()">
+      <b>Пероид</b>
+    <div class="period_selects">
+      <div class="period_select">
+          <span style="margin-right: 4px">С</span>
+        <input type="date" name="period_starts_at" required v-model="starts_at">
+      </div>
+
+      <div class="period_select finish">
+          <span style="margin-right: 4px">До</span>
+        <input type="date" name="period_finish_at" required v-model="ends_at">
+      </div>
+
+      <button type="submit">Получить action log</button>
+    </div>
+  </form>
+
+    <div id="admin_actions" v-if="admin_actions.length > 0">
+        <div class="residents_analytic">
+            <div class="clients_info list">
+                <div class="number">
+                    <p>№</p>
+                </div>
+                <div class="name">
+                    <p>ФИО</p>
+                </div>
+                <div class="place">
+                    <p>Время</p>
+                </div>
+                <div class="phone_number">
+                    <p>Действие</p>
+                </div>
+            </div>
+
+            <div id="admin_actions_list">
+                <div v-for="(admin_action, index) in admin_actions" class="clients_info_block" :key="index">
+                    <div class="clients_info">
+                        <div class="number">
+                            <p>${ index + 1 }</p>
+                        </div>
+                        <div class="name">
+                            <p>${ admin_action.admin_fullname }</p>
+                        </div>
+                        <div class="place">
+                            <p>${ get_admin_action_created_at_dt(admin_action) }</p>
+                        </div>
+                        <div class="phone_number">
+                            <p>${ admin_action.title }</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!--                <div id="admin_action_details_window">-->
+<!--                    <div v-if="current_opened_admin_action" class="side-panel">-->
+<!--                        <a class="side-button-2" href="#" style="text-decoration: none;">+</a>-->
+<!--                        <div class="side_info">-->
+<!--                            <b>Время:</b><span>${ current_opened_admin_action.created_at }</span>-->
+<!--                        </div>-->
+<!--                        <div class="side_info">-->
+<!--                            <b>ФИО:</b><span>${ current_opened_admin_action.admin_fullname }</span>-->
+<!--                        </div>-->
+<!--                        <div class="side_info">-->
+<!--                            <b>Действие:</b><span>${ current_opened_admin_action.title }</span>-->
+<!--                        </div>-->
+<!--                        <div class="side_info">-->
+<!--                            <b>Подробнее:</b><p>${ current_opened_admin_action.action_text }</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+<script src="{% static 'js/vue.global.prod.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/moment-tz.js' %}"></script>
+<script src="{% static 'js/axios.min.js' %}"></script>
+<script src="{% static 'js/sweetalert.min.js' %}"></script>
+<script src="{% static 'js/vue-cookies.js' %}"></script>
+<script src="{% static 'js/chart.js' %}"></script>
+
+
+
+<script src="{% static 'js/admin_page/main_section_app/models.js' %}"></script>
+<script src="{% static 'js/admin_page/main_section_app/app.js' %}"></script>
+<script>const mounted_main_section_app = main_section_app.mount("#main_section_app")</script>
+
+
+
+<script src="{% static 'js/admin_page/settings_section/models.js' %}"></script>
+<script src="{% static 'js/admin_page/settings_section/carousel_settings_app.js' %}"></script>
+<script src="{% static 'js/admin_page/settings_section/booking_request_notification_emails_settings_app.js' %}"></script>
+<script src="{% static 'js/admin_page/settings_section/prices_settings_app.js' %}"></script>
+<script src="{% static 'js/admin_page/settings_section/main.js' %}"></script>
+
+
+<script src="{% static 'js/admin_page/analytics_section/main.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/booking_requests_analytics/booking_requests_charts.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/booking_requests_analytics/booking_requests_analytics.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/booked_places_analytics/booked_places_charts.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/booked_places_analytics/booked_places_analytics.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/residents_analytics/residents_charts.js' %}"></script>
+<script src="{% static 'js/admin_page/analytics_section/residents_analytics/residents_analytics.js' %}"></script>
+
+
+<script src="{% static 'js/admin_page/admin_actions_section/app.js' %}"></script>
+
+
+<script src="{% static 'js/admin_page/current_opened_section.js' %}"></script>
+<script>
+    let username = "{{ request.user.username }}"
+</script>
+<script src="{% static 'js/admin_page/login_change.js' %}"></script>
+</body>
+</html>

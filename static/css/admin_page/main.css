@@ -1,0 +1,247 @@
+body{
+  margin: 0;
+  font-family: "Geometria";
+}
+
+.hamburger-menu {
+  display: none;
+}
+
+.block{
+  margin-block: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
+}
+
+.container{
+  width: 1280px;
+  margin: 20px auto;
+}
+
+.navbar{
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.nav_left{
+  display: flex;
+  align-items: center;
+}
+
+.logo img{
+  height: 30px;
+}
+
+.nav_links{
+  display: flex;
+  align-items: center;
+}
+
+.nav_link{
+  margin-left: 35px;
+}
+
+.nav_link a{
+  text-decoration: none;
+  color: #014660;
+  font-size: 22px;
+}
+
+.nav_right{
+  margin-left: auto;
+}
+
+.login_btn a{
+  padding: 8px 10px;
+  background-color: #004761;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.slider_block{
+  position: relative;
+}
+
+.booking_title h1{
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.booking_text p{
+  font-size: 16px;
+}
+
+.book_input{
+  width: 100%;
+}
+
+.book_input input, .book_input select {
+  width: calc(100% - 24px);
+  margin: 10px 0;
+  height: 50px;
+  font-size: 20px;
+  padding: 0 10px;
+  border: 0.5px solid grey;
+  border-radius: 5px;
+  outline: none;
+}
+
+.book_input select {
+    width: calc(100% - 2px);
+    height: 52px;
+}
+
+.form_booking{
+  position: absolute;
+  margin-top: 2px;
+}
+
+.booking{
+  width: 400px;
+  height: fit-content;
+  padding: 11px 20px 20px 20px;
+  background-color: white;
+  z-index: 1;
+  border-radius: 5px;
+  position: absolute;
+  left: 5%;
+  top: 18%;
+}
+
+.btn button{
+  width: calc(100% - 2px);
+  padding: 14px 0;
+  font-size: 20px;
+  color: #FFFFFF;
+  background-color: #FFA900;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.onehub_stats{
+  display: flex;
+  align-items: center;
+  padding: 25px 30px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.stat b{
+  font-size: 28px;
+}
+
+.stat p{
+  margin: 0px 0 0 0;
+  font-size: 18px;
+}
+
+.facilities {
+  padding: 30px;
+}
+
+.facilities_title{
+  font-size: 25px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.facility{
+  display: flex;
+  align-items: center;
+  margin: 30px 0 0 0;
+}
+
+.facility_info{
+  margin: 0 50px;
+}
+
+.facility_info b{
+  font-size: 30px;
+}
+
+.facility_info p{
+  font-size: 18px;
+}
+
+.facility_img img{
+  pointer-events: none;
+  user-select: none;
+  width: 300px;
+  border-radius: 20px;
+}
+
+footer{
+  background-color: #004761;
+  padding: 50px 0 150px 0;
+  display: block;
+  margin-top: 80px;
+}
+
+.footer_container{
+  margin: 0 auto;
+  position: relative;
+}
+
+.footer{
+  display: flex;
+}
+
+.footer_logo img{
+  height: 100px;
+}
+
+.footer_block{
+  margin-left: 100px;
+}
+
+.footer_blocks{
+  display: flex;
+}
+
+.footer_block b{
+  color: white;
+  display: block;
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.footer_link a{
+  font-size: 22px;
+  color: white;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.copyright{
+  position: absolute;
+  bottom: -130px;
+  left: 0;
+  width: 100%;
+}
+
+.copyright hr{
+  opacity: .5;
+}
+
+.copyright span{
+  font-size: 15px;
+  color: white;
+}
+
+#slider{
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#slider img{
+  width: 100%;
+}

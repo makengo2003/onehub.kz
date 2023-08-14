@@ -1,0 +1,586 @@
+.main{
+  display: flex;
+}
+
+.container{
+  width: calc(100vw - 250px - 30px);
+  margin: 0;
+  margin-left: 280px;
+  margin-top: 50px;
+  font-size: 14px;
+  min-width: 1260px;
+  z-index: 1;
+}
+
+.vertical_menu{
+  min-width: 250px;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, .1);
+  position: fixed;
+  left: 0;
+  height: 100%;
+  background-color: white;
+  z-index: 2;
+}
+
+.exit{
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+
+.exit button{
+  background: none;
+  border: none;
+  color: red;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.sections{
+  padding: 0px 20px;
+}
+
+.section{
+  position: relative;
+  margin: 15px 0;
+  align-items: center;
+}
+
+.section label{
+  font-size: 17px;
+  align-items: center;
+  min-height: 28px;
+  cursor: pointer;
+}
+
+.section input[type="radio"]{
+  visibility: hidden;
+  width: 7px;
+}
+
+.section input[type="radio"]:checked + label::before{
+  content: '•';
+  position: absolute;
+  color: #FE01C0;
+  font-size: 30px;
+  left: 0;
+  top: -5px;
+}
+
+.section img{
+  height: 22px;
+  margin-right: 5px;
+  margin-bottom: -3px;
+}
+
+.section p{
+  margin: 10px 0;
+}
+
+.bblock{
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.logo{
+  padding: 15px 20px;
+}
+
+.logo img{
+  height: 25px;
+}
+
+.user_name{
+  padding: 20px 20px;
+}
+
+.user_name b{
+  font-size: 18px;
+}
+
+.search_block input{
+  border: 1px solid grey;
+  padding: 5px 10px;
+  font-size: 17px;
+}
+
+.search_block input[type="submit"]{
+  background: none;
+  margin-left: -5px;
+  border-radius: 0 5px 5px 0;
+}
+
+.search_block button, #list_of_booking_requests button, #list_of_booked_lockers button {
+  background: none;
+  border: none;
+  background-color: green;
+  padding: 6px 20px;
+  color: white;
+  font-size: 18px;
+  margin-left: 30px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.search_block input[type="text"]{
+  outline: none;
+  border-radius: 5px 0 0 5px;
+}
+
+.list{
+  width: 97%;
+}
+
+.clients_info{
+  display: flex;
+  position: relative;
+}
+
+.clients_info img{
+  height: 35px;
+  margin: 6px 10px 6px 6px;
+}
+
+.clients_info_block{
+  # border: 1px solid grey;
+  # border-radius: 5px;
+  # margin-bottom: 20px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  margin: 0;
+  margin-bottom: 15px;
+  width: 97%;
+}
+
+.clients_info{
+  justify-content: space-between;
+  display: flex;
+  flex-grow: row;
+  flex-wrap: nowrap;
+}
+
+.number{
+  min-width: 50px;
+  text-align: center;
+}
+
+.name{
+  min-width: 280px;
+  margin-right: auto;
+}
+
+#admin_actions .name{
+  min-width: 255px;
+  margin-right: initial;
+}
+
+.phone_number{
+  margin-right: 0;
+  min-width: 150px;
+  max-width: 150px;
+  margin-right: auto;
+}
+
+#admin_actions .phone_number{
+  margin-right: initial;
+  min-width: initial;
+  max-width: initial;
+  margin-right: auto;
+}
+
+.place{
+  min-width: 85px;
+  margin-right: auto;
+}
+
+#admin_actions .place{
+  min-width: 235px;
+  margin-right: initial;
+}
+
+.paperCount {
+  margin-right: auto;
+  min-width: 100px;
+}
+
+.extend_btns{
+  margin-right: 20px;
+  min-width: 130px;
+  text-align: right;
+}
+
+.extend_btns span{
+  display: block;
+  margin: 14px 0;
+}
+
+.extend a{
+  text-decoration: none;
+  padding: 5px 15px;
+  background-color: green;
+  color: white;
+  border-radius: 5px;
+}
+
+.delete{
+  margin: 0 20px;
+}
+
+.delete a{
+  text-decoration: none;
+  padding: 5px 15px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+}
+
+.period_duration{
+  display: flex;
+}
+
+
+.choose_section button[value="1"] {
+  font-size: 18px;
+  color: orange;
+  background: none;
+  border: none;
+}
+
+
+.choose_section button[value="0"] {
+  font-size: 18px;
+  color: black;
+  opacity: 0.7;
+  background: none;
+  border: none;
+}
+
+
+.choose_section button {
+  width: fit-content;
+  white-space: nowrap;
+  margin: 0 20px 0 0;
+  cursor: pointer;
+}
+
+.choose_section {
+  margin-top: 20px;
+  display: flex;
+}
+
+.choose_section p {
+  border-radius: 7px; 
+  background-color: green;
+  color: white;
+  padding: 1px 2px 0.5px 2px;
+}
+
+.visited_today, .deposit_is_paid {
+  min-width: 70px;
+  text-align: right;
+}
+
+.visited_today p{
+  white-space: nowrap;
+}
+
+.visited_today_checkbox {
+  height: 16px;
+  width: 16px;
+  margin-top: 14px;
+  margin-right: 15px;
+}
+
+.time_type img{
+  height: 30px;
+}
+
+.date {
+  margin-right: auto;
+  min-width: 250px;
+}
+
+.clients_requests_list .place {
+  width: 160px;
+  margin-right: 50px;
+}
+
+.created_at {
+  min-width: 190px;
+  margin-right: auto;
+}
+
+.answered_at{
+  min-width: 115px;
+  margin-right: auto;
+}
+
+.clients_requests_list .clients_info_block .created_at {
+  margin-right: 60px;
+}
+
+#list_of_booked_places .name p {
+    cursor: pointer;
+    color: #3182a8;
+}
+
+#list_of_booked_places .name p:hover {
+   text-decoration: underline;
+}
+
+.extend input {
+    cursor: pointer;
+    margin-left: 5px;
+    border: none;
+    background-color: #d5cfcf;
+    font-size: 20px;
+    border-radius: 5px
+}
+
+.placeType {
+    min-width: 255px;
+    margin-right: auto;
+}
+
+.change_booked_place_info_btn {
+    cursor: pointer;
+    background-position: center;
+    margin: 12px -11px 32px 4px;
+    border: 1px;
+    background-size: cover;
+    background-color: black;
+}
+
+.editable_inputs {
+    margin: 12px 0;
+    font-size: initial;
+    border: none;
+    color: black;
+    opacity: 1;
+    font-size: 14px;
+    padding-left: 0;
+    padding-right: 0;
+    width: fit-content;
+}
+
+.place .editable_inputs {
+    width: 35px;
+}
+
+.paperCount .editable_inputs {
+    width: 35px;
+}
+
+.clients_info_name_input_disabled {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 250px;
+}
+
+.clients_info_name_input_enabled {
+    color: initial;
+    text-decoration: initial;
+    cursor: initial;
+}
+
+#recently_deleted .paperCount {
+    width: 300px;
+}
+
+#recently_deleted #list_of_deleted_booked_places .paperCount {
+    width: 190px;
+}
+
+.set_menu button{
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+  color: blue;
+}
+
+.go_back_set_menu {
+    font-size: 20px;
+    margin-bottom: 35px;
+    font-weight: bold;
+}
+
+.carousel_f_block ol{
+  padding-left: 22px;
+  margin-bottom: 50px;
+}
+
+.carousel_f_block li{
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.edit_carousel button{
+  background-color: green;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.car_input{
+  margin: 10px 0;
+  border: 1px solid rgba(0, 0, 0, .5);
+  padding: 10px 10px;
+  border-radius: 5px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+}
+
+.car_input button{
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.car_input img{
+  height: 20px;
+}
+
+.edit_btns button{
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+}
+
+.save{
+  background-color: green;
+  margin-right: 15px;
+}
+
+.back{
+  background-color: red;
+}
+
+.select_place {
+    display: inline-block;
+}
+
+.add_new_place_type_text_btn {
+    display: inline-block;
+    color: blue;
+}
+
+.select_place span{
+  font-size: 18px;
+}
+
+.select_place select, option{
+  font-size: 18px;
+  margin-left: 10px;
+  margin-right: 50px;
+}
+
+.main_price_block, .meeting_price_block, .conf_price_block{
+  margin-left: 0;
+  margin-top: 10px;
+}
+
+.col input, .col select{
+  font-size: 17px;
+  width: 130px;
+}
+
+.place_type{
+    margin: 20px 0 0 0;
+    font-size: 24px;
+    width: 400px;
+}
+
+.accept_booking_request_btn {
+    background-color: green;
+    border: 0px;
+    border-radius: 5px;
+    margin-right: 10px;
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 25px;
+}
+
+.reject_booking_request_btn {
+    background-color: red;
+    border: 0px;
+    border-radius: 5px;
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 25px;
+}
+
+.period_form select, option, input{
+  padding: 5px;
+  font-size: 16px;
+}
+
+.period_form b{
+  margin-bottom: 5px;
+  display: block;
+  font-size: 18px;
+}
+
+.period_selects{
+  display: flex;
+}
+
+.finish{
+  margin-left: 30px;
+}
+
+.analityc_block{
+  margin: 10px 0;
+  border: 1px solid rgba(0, 0, 0, .5);
+  border-radius: 3px;
+  width: 98%;
+  min-width: 1100px;
+}
+
+.analityc_block summary{
+  cursor: pointer;
+  padding: 10px 5px;
+  list-style: none;
+  outline: none
+}
+
+.right_arrow{
+  height: 10px;
+  margin-right: 5px;
+}
+
+.analityc_block details[open] .right_arrow{
+  rotate: 90deg;
+}
+
+.charts{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chart{
+  width: 40%;
+  margin: 10px 20px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.pies_chart{
+  height: 300px;
+  width: fit-content;
+}

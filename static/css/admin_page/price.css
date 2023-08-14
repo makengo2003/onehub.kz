@@ -1,0 +1,66 @@
+body{
+	font-family: sans-serif;
+	margin: 0;
+}
+
+.main_price_block{
+	margin: 50px auto;
+	max-width: 900px;
+}
+
+.meeting_price_block{
+	width: 500px;
+	margin: 50px auto;
+}
+
+.conf_price_block{
+	width: 500px;
+	margin: 50px auto;
+}
+
+.row{
+	display: flex;
+}
+
+.col{
+	width: 100%;
+	padding: 5px 10px;
+	border: 1px solid #004562;
+}
+
+.col span{
+	color: #004562;
+}
+
+.lt{
+	border-radius: 10px 0 0 0;
+}
+
+.rt{
+	border-radius: 0 10px 0 0;
+}
+
+.lb{
+	border-radius: 0 0 0 10px;
+}
+
+.rb{
+	border-radius: 0 0 10px 0;
+}
+
+.top span{
+	color: white;
+}
+
+.bold{
+	font-size: 18px;
+	font-weight: bolder;
+}
+
+.top{
+	background-color: #004562;
+}
+
+.span{
+	margin: 0 10px;
+}
