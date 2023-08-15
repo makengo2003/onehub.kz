@@ -23,8 +23,10 @@ def get_booking_requests_analytics(period_label: str, starts_at: datetime, ends_
 def get_booked_places_analytics(period_label: str, starts_at: datetime, ends_at: datetime) -> Mapping:
     booked_places = BookedPlace.objects.filter(
         Q(created_at__gte=starts_at) & Q(created_at__lte=ends_at)
-    ).select_related("from_booked_place_to_resident").order_by('created_at').values("created_at", "type", "term", "time_type", "deposit",
-                                                             "payment_type", "is_paid", "from_booked_place_to_resident")
+    ).select_related("from_booked_place_to_resident").order_by('created_at').values("created_at", "type", "term",
+                                                                                    "time_type", "deposit",
+                                                                                    "payment_type", "is_paid",
+                                                                                    "from_booked_place_to_resident")
 
     return booked_places_services.get_booked_places_analytics(period_label, booked_places)
 
@@ -65,3 +67,32 @@ periods = {
 
 def get_starts_and_ends_at_dt_from_period_label(period_label: str) -> Tuple[datetime, datetime]:
     return periods[period_label]["starts_at"], periods[period_label]["ends_at"]
+
+
+month_names = {
+    1: "Январь",
+    2: "Февраль",
+    3: "Март",
+    4: "Апрель",
+    5: "Май",
+    6: "Июнь",
+    7: "Июль",
+    8: "Август",
+    9: "Сентябрь",
+    10: "Октябрь",
+    11: "Ноябрь",
+    12: "Декабрь"
+}
+
+
+def get_period_label(period_label: str, dt: datetime) -> str:
+    if period_label == "today" or period_label == "yesterday":
+        label = f'Время: {str(dt.hour)}:00'
+    elif period_label == "week_ago":
+        label = f'{month_names[dt.month]}: {str(dt.day)}'
+    elif period_label == "month_ago":
+        label = f'{month_names[dt.month]}: {str(dt.day)}'
+    else:
+        label = month_names[dt.month]
+
+    return label

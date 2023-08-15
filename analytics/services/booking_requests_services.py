@@ -1,6 +1,8 @@
 from typing import Mapping
 from django.db.models import Min, Max, Avg, F, QuerySet
 
+from analytics import main_services
+
 
 def get_booking_requests_analytics(period_label: str, booking_requests: QuerySet[Mapping]) -> Mapping:
     rejection_reasons_list = []
@@ -20,14 +22,7 @@ def get_booking_requests_analytics(period_label: str, booking_requests: QuerySet
         total_booking_requests_count[created_at_date.year][created_at_date.month - 1] = \
             total_booking_requests_count[created_at_date.year].get(created_at_date.month - 1, 0) + 1
 
-        if period_label == "today" or period_label == "yesterday":
-            label = f'Время: {str(booking_request["created_at"].hour)}:00'
-        elif period_label == "week_ago":
-            label = f'День: {str(booking_request["created_at"].day)}'
-        elif period_label == "month_ago":
-            label = f'День: {str(booking_request["created_at"].day)}'
-        else:
-            label = f'Месяц: {str(booking_request["created_at"].month)}'
+        label = main_services.get_period_label(period_label, booking_request["created_at"])
 
         if booking_request["is_accepted"]:
             accepted_booking_requests_count[label] = accepted_booking_requests_count.get(label, 0) + 1

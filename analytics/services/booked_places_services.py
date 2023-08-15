@@ -1,6 +1,8 @@
 from typing import Mapping
 from django.db.models import QuerySet
 
+from analytics import main_services
+
 
 def get_booked_places_analytics(period_label: str, booked_places: QuerySet[Mapping]) -> Mapping:
     place_types = {}
@@ -14,14 +16,7 @@ def get_booked_places_analytics(period_label: str, booked_places: QuerySet[Mappi
         time_types[booked_place["time_type"]] = time_types.get(booked_place["time_type"], 0) + 1
         terms[booked_place["term"]] = terms.get(booked_place["term"], 0) + 1
 
-        if period_label == "today" or period_label == "yesterday":
-            label = f'Время: {str(booked_place["created_at"].hour)}:00'
-        elif period_label == "week_ago":
-            label = f'День: {str(booked_place["created_at"].day)}'
-        elif period_label == "month_ago":
-            label = f'День: {str(booked_place["created_at"].day)}'
-        else:
-            label = f'Месяц: {str(booked_place["created_at"].month)}'
+        label = main_services.get_period_label(period_label, booked_place["created_at"])
 
         total_booked_places_count[label] = total_booked_places_count.get(label, 0) + 1
         if booked_place["from_booked_place_to_resident"]:

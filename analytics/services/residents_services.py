@@ -1,4 +1,5 @@
 from typing import Mapping
+from analytics import main_services
 from django.db.models import QuerySet
 
 
@@ -16,14 +17,7 @@ def get_residents_analytics(period_label: str, residents: QuerySet[Mapping]) -> 
                           "day": {"Отсутствие": 0, "Присутствие": 0}}
 
     for resident in residents:
-        if period_label == "today" or period_label == "yesterday":
-            label = f'Время: {str(resident["created_at"].hour)}:00'
-        elif period_label == "week_ago":
-            label = f'День: {str(resident["created_at"].day)}'
-        elif period_label == "month_ago":
-            label = f'День: {str(resident["created_at"].day)}'
-        else:
-            label = f'Месяц: {str(resident["created_at"].month)}'
+        label = main_services.get_period_label(period_label, resident["created_at"])
 
         residents_count[label] = residents_count.get(label, 0) + 1
         income[label] = income.get(label, 0) + resident["price"]
