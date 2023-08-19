@@ -926,7 +926,15 @@
                         <b>Тип оплаты:</b><span>${ current_opened_booked_place.payment_type_text() }</span>
                     </div>
                     <div class="side_info">
-                        <b>Депозит:</b><span>${ current_opened_booked_place.deposit } тг</span>
+<!--                        <b>Депозит:</b><span>${ current_opened_booked_place.deposit } тг</span>-->
+                        <b>Депозит:</b><input type="number" :disabled="!editable_booked_place_fields.deposit.enabled" v-model="current_opened_booked_place.deposit">
+                      <div class="side_info_edit">
+                        <button @click="enable_booked_place_field(editable_booked_place_fields.deposit, current_opened_booked_place.deposit)" v-if="!editable_booked_place_fields.deposit.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_booked_place_info(current_opened_booked_place, 'deposit', current_opened_booked_place.deposit)" class="edit_accept">☑️</button>
+                          <button @click="cancel_booked_place_field_editing('deposit')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
                     </div>
                     <div class="side_info">
                       <b>Длительность:</b><span>${ current_opened_booked_place.duration }</span>

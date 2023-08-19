@@ -139,6 +139,10 @@ const main_section_app = Vue.createApp({
                 consumer_phone_number: {
                     enabled: false,
                     value_before_editing: null
+                },
+                deposit: {
+                    enabled: false,
+                    value_before_editing: null
                 }
             },
             booking_request_rejection_form: {
@@ -308,6 +312,7 @@ const main_section_app = Vue.createApp({
                 this.add_booked_place_form["booking_request_id"] = 0
                 this.add_resident_form["booked_place"] = null
                 this.add_resident_form["booked_place_id"] = 0
+                this.add_resident_form["submit_function"] = "calculate_price"
             }
 
             this.add_booked_place_form["starts_at"] = moment().format('YYYY-MM-DDTHH:mm')
@@ -373,6 +378,11 @@ const main_section_app = Vue.createApp({
             if (this.add_resident_form["submit_function"] == "calculate_price") {
                 axios.get("/resident/calculate_resident_adding_price/", {params: this.add_resident_form}).then((response) => {
                     this.add_resident_form["price"] = response.data["price"]
+
+                    if (this.add_resident_form["booked_place_id"] != 0) {
+                        this.add_resident_form["price"] -= this.add_resident_form["booked_place"]["deposit"]
+                    }
+
                     this.add_resident_form["submit_function"] = "add_resident"
                 }).catch((error) => {
                     if (error.response) {
@@ -498,6 +508,10 @@ const main_section_app = Vue.createApp({
                     value_before_editing: null
                 },
                 consumer_phone_number: {
+                    enabled: false,
+                    value_before_editing: null
+                },
+                deposit: {
                     enabled: false,
                     value_before_editing: null
                 }
@@ -695,6 +709,7 @@ const main_section_app = Vue.createApp({
             this.add_resident_form["term"] = booked_place.term
             this.add_resident_form["time_type"] = booked_place.time_type
             this.add_resident_form["starts_at"] = moment(booked_place.starts_at, "DD.MM.YYYY, HH:mm").format("yyyy-MM-DDTHH:mm")
+            this.add_resident_form["submit_function"] = "calculate_price"
         },
         open_booking_request_rejection_form(booking_request) {
             window.location.hash = "booking_request_rejection_form-zatemnenie"
