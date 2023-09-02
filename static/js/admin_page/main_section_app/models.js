@@ -18,6 +18,7 @@ class Resident {
         this.term = json_data["fields"]["term"]
         this.time_type = json_data["fields"]["time_type"]
         this.visited_today = json_data["fields"]["visited_today"]
+        this.locker = json_data["fields"]["locker"]
     }
 
     compare(field, compare_value, reverse=false) {
@@ -150,6 +151,7 @@ class DeletedResident {
         this.duration = json_data["fields"]["duration"]
         this.term = json_data["fields"]["term"]
         this.time_type = json_data["fields"]["time_type"]
+        this.locker = json_data["fields"]["locker"]
     }
 
     payment_type_text() {

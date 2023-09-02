@@ -27,6 +27,8 @@ class Resident(models.Model):
     term = models.CharField(max_length=50, choices=settings.PLACE_BOOKING_TERMS)
     time_type = models.CharField(max_length=50, choices=settings.TIME_TYPES)
 
+    locker = models.CharField(max_length=10, null=True, blank=True)
+
     def __str__(self):
         return f"{self.pk}. {self.fullname} [{str(self.status).upper()}]. {self.created_at}"
 

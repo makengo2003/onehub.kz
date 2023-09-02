@@ -390,10 +390,10 @@
                     <p>Номер телефона</p>
                 </div>
                 <div class="place">
-                    <p @click="residents_order_by('place_number')">
-                        Место
-                        <span style="font-size: 17px" v-if="residents_order_by_column == 'place_number'"><b>↑</b></span>
-                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-place_number'"><b>↓</b></span>
+                    <p @click="residents_order_by('locker')">
+                        Локер
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'locker'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-locker'"><b>↓</b></span>
                     </p>
                 </div>
                 <div class="placeType">
@@ -432,7 +432,7 @@
                             <p>${ resident.phone_number }</p>
                         </div>
                         <div class="place">
-                            <p>${ resident.place_number }</p>
+                            <p>${ resident.locker }</p>
                         </div>
                         <div class="placeType">
                             <p>${ resident.place_type }</p>
@@ -507,6 +507,16 @@
                         <div class="edit_btns" v-else>
                           <button @click="update_resident_info(current_opened_resident, 'paper_count', current_opened_resident.paper_count)" class="edit_accept">☑️</button>
                           <button @click="cancel_resident_field_editing('paper_count')" class="edit_remove">❌</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="side_info">
+                      <b>Локер:</b><input type="text" :disabled="!editable_resident_fields.locker.enabled" v-model="current_opened_resident.locker">
+                      <div class="side_info_edit">
+                        <button @click="enable_resident_field(editable_resident_fields.locker, current_opened_resident.locker)" v-if="!editable_resident_fields.locker.enabled" class="edit"><img src="{% static 'imgs/admin_page/pencil.png' %}" alt=""></button>
+                        <div class="edit_btns" v-else>
+                          <button @click="update_resident_info(current_opened_resident, 'locker', current_opened_resident.locker)" class="edit_accept">☑️</button>
+                          <button @click="cancel_resident_field_editing('locker')" class="edit_remove">❌</button>
                         </div>
                       </div>
                     </div>

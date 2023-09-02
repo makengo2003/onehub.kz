@@ -129,6 +129,10 @@ const main_section_app = Vue.createApp({
                 paper_count: {
                     enabled: false,
                     value_before_editing: null
+                },
+                locker: {
+                    enabled: false,
+                    value_before_editing: null
                 }
             },
             editable_booked_place_fields: {
@@ -465,6 +469,16 @@ const main_section_app = Vue.createApp({
                 })
         },
         update_resident_info(resident, field, value) {
+            if (field == "locker") {
+                for (var i = 0; i < this.residents.length; i++) {
+                    if (this.residents[i] != resident) {
+                        if (this.residents[i].locker == value) {
+                            alert(this.residents[i].fullname + " занял(a) локер " + value)
+                            return
+                        }
+                    }
+                }
+            }
             axios.post("/resident/update_resident_info/",
                 {"resident_id": resident.id, "field_for_updating": field, "new_value": value}, {
                     headers: {
@@ -494,6 +508,10 @@ const main_section_app = Vue.createApp({
                     value_before_editing: null
                 },
                 paper_count: {
+                    enabled: false,
+                    value_before_editing: null
+                },
+                locker: {
                     enabled: false,
                     value_before_editing: null
                 }
