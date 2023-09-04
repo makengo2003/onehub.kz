@@ -1269,13 +1269,17 @@
 <div id="analytics_section" class="container analtics_page" style="display: none">
   <div class="period_form">
       <b style="margin-bottom: 7px">Пероид</b>
-      <div id="select_analytics_period_block" style="display: flex; margin-bottom: 20px">
-        <button id="today_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('today')">Сегодня</button>
-        <button id="yesterday_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('yesterday')">Вчера</button>
-        <button id="week_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('week_ago')">Неделя</button>
-        <button id="month_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('month_ago')">Месяц</button>
-        <button id="year_ago_analytics_period_select_btn" class="select_analytics_period_btn" onclick="get_analytics('year_ago')">Год</button>
-      </div>
+        <div class="period_selects">
+           <div class="period_select">
+               <span>С</span>
+             <input type="date" name="period_starts_at" required onchange="analytics_starts_at = this.value; get_analytics()">
+           </div>
+
+           <div class="period_select finish">
+               <span>До</span>
+             <input type="date" name="period_finish_at" required onchange="analytics_ends_at = this.value; get_analytics()">
+           </div>
+         </div>
   </div>
 
     <div id="analytics" style="display: none">

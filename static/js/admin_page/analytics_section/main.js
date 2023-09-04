@@ -1,4 +1,5 @@
-var current_selected_period = null
+var analytics_starts_at = 0
+var analytics_ends_at = 0
 
 const CHART_COLORS = {
     c: '#4c6d89',
@@ -38,19 +39,11 @@ function get_chart_options(title) {
     }
 }
 
-function get_analytics(period) {
-    if (!current_selected_period) {
-        current_selected_period = document.getElementById(period + "_analytics_period_select_btn")
-        current_selected_period.className = "selected_analytics_period_btn"
-    } else {
-        current_selected_period.className = "select_analytics_period_btn"
-        current_selected_period = document.getElementById(period + "_analytics_period_select_btn")
-        current_selected_period.className = "selected_analytics_period_btn"
-    }
-
+function get_analytics() {
     axios.get("/analytics/get_analytics/", {
         params: {
-            period_label: period
+            starts_at: analytics_starts_at,
+            ends_at: analytics_ends_at
         }
     }).then((response) => {
         update_booking_requests_analytics(response.data["booking_requests_analytics"])

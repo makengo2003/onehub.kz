@@ -1,11 +1,9 @@
-from datetime import datetime
-from typing import Mapping, Tuple
+from datetime import datetime, timedelta
+from typing import Mapping
 
-from dateutil.relativedelta import relativedelta
 from django.db.models import Q, Count
 
 from booking.models import BookingRequest, BookedPlace
-from project.utils import datetime_now
 from resident.models import Resident
 from .services import booking_requests_services, booked_places_services, residents_services
 
@@ -41,34 +39,6 @@ def get_residents_analytics(period_label: str, starts_at: datetime, ends_at: dat
     return residents_services.get_residents_analytics(period_label, residents)
 
 
-periods = {
-    "today": {
-        "starts_at": datetime_now().replace(hour=0, minute=0),
-        "ends_at": datetime_now().replace(hour=23, minute=59)
-    },
-    "yesterday": {
-        "starts_at": datetime_now().replace(hour=0, minute=0) - relativedelta(days=1),
-        "ends_at": datetime_now().replace(hour=23, minute=59) - relativedelta(days=1)
-    },
-    "week_ago": {
-        "starts_at": datetime_now().replace(hour=0, minute=0) - relativedelta(weeks=1),
-        "ends_at": datetime_now().replace(hour=23, minute=59)
-    },
-    "month_ago": {
-        "starts_at": datetime_now().replace(hour=0, minute=0) - relativedelta(months=1),
-        "ends_at": datetime_now().replace(hour=23, minute=59)
-    },
-    "year_ago": {
-        "starts_at": datetime_now().replace(hour=0, minute=0) - relativedelta(years=1),
-        "ends_at": datetime_now().replace(hour=23, minute=59)
-    }
-}
-
-
-def get_starts_and_ends_at_dt_from_period_label(period_label: str) -> Tuple[datetime, datetime]:
-    return periods[period_label]["starts_at"], periods[period_label]["ends_at"]
-
-
 month_names = {
     1: "Январь",
     2: "Февраль",
@@ -85,14 +55,21 @@ month_names = {
 }
 
 
-def get_period_label(period_label: str, dt: datetime) -> str:
-    if period_label == "today" or period_label == "yesterday":
-        label = f'Время: {str(dt.hour)}:00'
-    elif period_label == "week_ago":
-        label = f'{month_names[dt.month]}: {str(dt.day)}'
-    elif period_label == "month_ago":
-        label = f'{month_names[dt.month]}: {str(dt.day)}'
+def get_period_label(period_name: str, dt: datetime) -> str:
+    if period_name == "hours":
+        return f'{str(dt.day)} {month_names[dt.month]}: {str(dt.hour)}:00'
+    elif period_name == "days":
+        return f'{str(dt.day)} {month_names[dt.month]}'
     else:
-        label = month_names[dt.month]
+        return month_names[dt.month]
 
-    return label
+
+def get_period_name(starts_at: datetime, ends_at: datetime) -> str:
+    time_difference = ends_at - starts_at
+
+    if time_difference <= timedelta(days=3):
+        return "hours"
+    elif time_difference <= timedelta(days=37):
+        return "days"
+    else:
+        return "months"
