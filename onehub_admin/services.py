@@ -68,9 +68,9 @@ def get_booked_places_list(last_obj_id: Optional[int] = 0) -> Tuple[QuerySet[Boo
     return booked_places_list, booked_places_list.aggregate(Max('id'))["id__max"]
 
 
-def get_deleted_booked_places_list(last_obj_id: Optional[int] = 0) -> Tuple[QuerySet[BookedPlace], int]:
-    deleted_booked_places_list = BookedPlace.objects.filter(status="deleted",
-                                                            id__gt=last_obj_id).order_by("-id")
+def get_deleted_booked_places_list(last_obj_id: Optional[int], starts_at: datetime, ends_at: datetime) -> Tuple[QuerySet[BookedPlace], int]:
+    deleted_booked_places_list = BookedPlace.objects.filter(status="deleted", deleted_at__gte=starts_at,
+                                                            deleted_at__lt=ends_at).order_by("deleted_at")
     return deleted_booked_places_list, deleted_booked_places_list.aggregate(Max('id'))["id__max"]
 
 
@@ -90,9 +90,9 @@ def get_residents_list(last_obj_id: Optional[int] = 0) -> Tuple[Sequence, int]:
     return serialized, residents_list.aggregate(Max('id'))["id__max"]
 
 
-def get_deleted_residents_list(last_obj_id: Optional[int] = 0) -> Tuple[QuerySet[Resident], int]:
-    deleted_residents_list = Resident.objects.filter(status="deleted",
-                                                     id__gt=last_obj_id).order_by("-id")
+def get_deleted_residents_list(last_obj_id: Optional[int], starts_at: datetime, ends_at: datetime) -> Tuple[QuerySet[Resident], int]:
+    deleted_residents_list = Resident.objects.filter(status="deleted", deleted_at__gte=starts_at,
+                                                     deleted_at__lt=ends_at).order_by("deleted_at")
     return deleted_residents_list, deleted_residents_list.aggregate(Max('id'))["id__max"]
 
 

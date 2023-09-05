@@ -620,6 +620,13 @@
 
 
         <div id="section_deleted_residents_list" style="display: none">
+            <div class="time_period_select" style="display: flex; gap: 10px; align-items: center;">
+                <span>C</span>
+                <input type="date" id="deleted_residents_starts_at_input" v-model="deleted_residents_starts_at" @change="get_deleted_residents_list()">
+                <span style="margin-left: 20px;">До</span>
+                <input type="date" id="deleted_residents_ends_at_input" v-model="deleted_residents_ends_at" @change="get_deleted_residents_list()">
+            </div>
+
             <div class="clients_info list">
                 <div class="number">
                     <p>№</p>
@@ -726,6 +733,13 @@
 
 
         <div id="section_deleted_booked_places_list" style="display: none">
+            <div class="time_period_select" style="display: flex; gap: 10px; align-items: center;">
+                <span>C</span>
+                <input type="date" id="deleted_booked_places_starts_at_input" v-model="deleted_booked_places_starts_at" @change="get_deleted_booked_places_list()">
+                <span style="margin-left: 20px;">До</span>
+                <input type="date" id="deleted_booked_places_ends_at_input" v-model="deleted_booked_places_ends_at" @change="get_deleted_booked_places_list()">
+            </div>
+
             <div class="clients_info list">
                 <div class="number">
                     <p>№</p>

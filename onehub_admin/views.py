@@ -30,7 +30,9 @@ def get_residents_list_view(request):
 
 @api_view(["GET"])
 def get_deleted_residents_list_view(request):
-    deleted_residents_list, last_obj_id = get_deleted_residents_list(request.query_params.get("last_obj_id", 0))
+    starts_at = request.query_params.get("starts_at")
+    ends_at = request.query_params.get("ends_at")
+    deleted_residents_list, last_obj_id = get_deleted_residents_list(request.query_params.get("last_obj_id", 0), starts_at, ends_at)
     return Response({"deleted_residents_list": serialize("python", deleted_residents_list), "last_obj_id": last_obj_id})
 
 
@@ -42,7 +44,9 @@ def get_booked_places_list_view(request):
 
 @api_view(["GET"])
 def get_deleted_booked_places_list_view(request):
-    deleted_booked_places_list, last_obj_id = get_deleted_booked_places_list(request.query_params.get("last_obj_id", 0))
+    starts_at = request.query_params.get("starts_at")
+    ends_at = request.query_params.get("ends_at")
+    deleted_booked_places_list, last_obj_id = get_deleted_booked_places_list(request.query_params.get("last_obj_id", 0), starts_at, ends_at)
     return Response({"deleted_booked_places_list": serialize("python", deleted_booked_places_list),
                      "last_obj_id": last_obj_id})
 

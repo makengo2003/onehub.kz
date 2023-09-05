@@ -8,8 +8,8 @@ const main_section_app = Vue.createApp({
                 "residents_list": this.get_residents_list,
                 "booked_places_list": this.get_booked_places_list,
                 "booking_requests_list": this.get_booking_requests_list,
-                "deleted_residents_list": this.get_deleted_residents_list,
-                "deleted_booked_places_list": this.get_deleted_booked_places_list,
+                "deleted_residents_list": function(){},
+                "deleted_booked_places_list": function(){},
             },
 
             lists_before_searching: {
@@ -155,6 +155,10 @@ const main_section_app = Vue.createApp({
             },
             residents_order_by_column: '',
             booked_places_order_by_column: '',
+            deleted_residents_starts_at: "",
+            deleted_residents_ends_at: "",
+            deleted_booked_places_starts_at: "",
+            deleted_booked_places_ends_at: ""
         }
     },
     methods: {
@@ -239,7 +243,14 @@ const main_section_app = Vue.createApp({
             })
         },
         get_deleted_residents_list() {
-            axios.get('/onehub_admin/get_deleted_residents_list/', {params: {last_obj_id: this.deleted_residents_last_obj_id}}).then((response) => {
+            this.deleted_residents = []
+            axios.get('/onehub_admin/get_deleted_residents_list/', {
+                params: {
+                    last_obj_id: this.deleted_residents_last_obj_id,
+                    starts_at: this.deleted_residents_starts_at,
+                    ends_at: this.deleted_residents_ends_at
+                }
+            }).then((response) => {
                  var _search_input = this.search_input
                  this.search_input = ""
                  this.search()
@@ -257,7 +268,14 @@ const main_section_app = Vue.createApp({
             })
         },
         get_deleted_booked_places_list() {
-            axios.get('/onehub_admin/get_deleted_booked_places_list/', {params: {last_obj_id: this.deleted_booked_places_last_obj_id}}).then((response) => {
+            this.deleted_booked_places = []
+            axios.get('/onehub_admin/get_deleted_booked_places_list/', {
+                params: {
+                    last_obj_id: this.deleted_booked_places_last_obj_id,
+                    starts_at: this.deleted_booked_places_starts_at,
+                    ends_at: this.deleted_booked_places_ends_at
+                }
+            }).then((response) => {
                  var _search_input = this.search_input
                  this.search_input = ""
                  this.search()
