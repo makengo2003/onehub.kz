@@ -184,7 +184,12 @@ def delete_booked_place(booked_place_id: int) -> None:
 
 
 def update_booked_place_info(booked_place_id: int, field_for_updating: str, new_value: T) -> None:
-    BookedPlace.objects.filter(id=booked_place_id).update(**{field_for_updating: new_value})
+    update_fields = {field_for_updating: new_value}
+
+    if field_for_updating == "status" and new_value == "deleted":
+        update_fields["deleted_at"] = datetime_now()
+
+    BookedPlace.objects.filter(id=booked_place_id).update(**update_fields)
 
 
 def search_by_fullname(fullname):

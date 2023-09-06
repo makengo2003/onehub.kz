@@ -129,6 +129,7 @@ class BookingRequest {
         this.created_at = moment(json_data["fields"]["created_at"]).utc().format("DD.MM.YYYY, HH:mm")
         this.answered_at = moment(json_data["fields"]["answered_at"]).utc().format("DD.MM.YYYY, HH:mm")
         this.is_accepted = json_data["fields"]["is_accepted"]
+        this.rejection_reason = json_data["fields"]["rejection_reason"]
     }
 }
 

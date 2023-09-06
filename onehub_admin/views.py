@@ -54,7 +54,10 @@ def get_deleted_booked_places_list_view(request):
 @api_view(["GET"])
 def get_booking_requests_list_view(request):
     booking_requests_list, last_obj_id = get_booking_requests_list(request.query_params.get("last_obj_id", 0))
-    return Response({"booking_requests_list": serialize("python", booking_requests_list), "last_obj_id": last_obj_id})
+    booking_requests = serialize("python", booking_requests_list)
+    for i, booking_request in enumerate(booking_requests):
+        booking_request["fields"]["rejection_reason"] = booking_requests_list[i].rejection_reason
+    return Response({"booking_requests_list": booking_requests, "last_obj_id": last_obj_id})
 
 
 @user_passes_test(lambda user: user.is_superuser)

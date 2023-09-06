@@ -1026,7 +1026,7 @@
        </div>
 
 
-        <div id="section_booking_requests_list" style="display: none;">
+        <div id="section_booking_requests_list" style="display: none; width: 100vw">
             <div class="clients_info list">
                 <div class="number">
                     <p>№</p>
@@ -1047,7 +1047,8 @@
                     <p>Принято</p>
                 </div>
                 <div class="extend_btns">
-                    
+                </div>
+                <div class="extend_btns">
                 </div>
             </div>
 
@@ -1079,6 +1080,9 @@
                     <div v-else style="display: flex; margin-right: 10px;">
                         <button @click="from_booking_request_to_booked_place(booking_request)" class="accept_booking_request_btn">Принять</button>
                         <button @click="open_booking_request_rejection_form(booking_request)" class="reject_booking_request_btn">Отказать</button>
+                    </div>
+                    <div class="extend_btns">
+                        <span>${ booking_request.rejection_reason }</span>
                     </div>
                 </div>
             </div>

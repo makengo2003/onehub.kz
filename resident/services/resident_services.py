@@ -204,7 +204,12 @@ def delete_resident(resident_id: int) -> None:
 
 
 def update_resident_info(resident_id: int, field_for_updating: str, new_value: T) -> None:
-    Resident.objects.filter(id=resident_id).update(**{field_for_updating: new_value})
+    update_fields = {field_for_updating: new_value}
+
+    if field_for_updating == "status" and new_value == "deleted":
+        update_fields["deleted_at"] = datetime_now()
+
+    Resident.objects.filter(id=resident_id).update(**update_fields)
 
 
 def update_resident_visited_today_status(resident_id: int) -> None:

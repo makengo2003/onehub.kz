@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User
 from django.core.serializers import serialize
-from django.db.models import QuerySet, Q, Max
+from django.db.models import QuerySet, Q, Max, F
 from rest_framework import serializers
 from rest_framework.request import Request
 
@@ -75,7 +75,9 @@ def get_deleted_booked_places_list(last_obj_id: Optional[int], starts_at: dateti
 
 
 def get_booking_requests_list(last_obj_id: Optional[int] = 0) -> Tuple[QuerySet[BookingRequest], int]:
-    booking_requests_list = BookingRequest.objects.filter(id__gt=last_obj_id).order_by("-id")
+    booking_requests_list = BookingRequest.objects.filter(id__gt=last_obj_id).annotate(
+        rejection_reason=F('rejected_booking_request__rejection_reason')
+    ).order_by("-id")
     return booking_requests_list, booking_requests_list.aggregate(Max('id'))["id__max"]
 
 
