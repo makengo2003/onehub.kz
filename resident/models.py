@@ -29,6 +29,9 @@ class Resident(models.Model):
 
     locker = models.CharField(max_length=10, null=True, blank=True)
 
+    visited_times = models.PositiveIntegerField(default=0, editable=False)
+    window = models.PositiveIntegerField(default=0)
+
     def __str__(self):
         return f"{self.pk}. {self.fullname} [{str(self.status).upper()}]. {self.created_at}"
 

@@ -72,7 +72,10 @@ const main_section_app = Vue.createApp({
                 "duration": 1,
                 "term": "hours",
                 "type": "",
-                "deposit": 0
+                "deposit": 0,
+                "discount": 0,
+                "price": 0,
+                "window": 0
             },
             add_resident_form: {
                 "payment_type": "cashless",
@@ -87,7 +90,8 @@ const main_section_app = Vue.createApp({
                 "term": "hours",
                 "place_type": "",
                 "used_discount": 0,
-                "price": 0
+                "price": 0,
+                "window": 0
             },
 
             renew_resident_form: {
@@ -99,14 +103,20 @@ const main_section_app = Vue.createApp({
                 price: 0,
                 used_discount: 0,
                 payment_type: "cashless",
-                submit_function: "calculate_price"
+                submit_function: "calculate_price",
+                window: 0
             },
             renew_booked_place_form: {
                 booked_place: 0,
                 booked_place_id: 0,
                 duration: 1,
                 term: "hours",
-                time_type: "daytime"
+                time_type: "daytime",
+                discount: 0,
+                price: 0,
+                type: "",
+                deposit: 0,
+                window: 0
             },
 
             current_opened_deleted_booked_place: null,
@@ -340,6 +350,28 @@ const main_section_app = Vue.createApp({
             this.add_booked_place_form["starts_at"] = moment().format('YYYY-MM-DDTHH:mm')
             this.add_resident_form["starts_at"] = moment().format('YYYY-MM-DDTHH:mm')
         },
+        calculate_booking_price(event) {
+            event.preventDefault();
+
+            axios("/booking/calculate_price/", {
+                params: {
+                    "booked_place_form": JSON.stringify(this.add_booked_place_form)
+                }
+            }).then((response) => {
+                this.add_booked_place_form["price"] = response.data["price"]
+            })
+        },
+        calculate_renewing_booked_place_price(event) {
+            event.preventDefault();
+
+            axios("/booking/calculate_price/", {
+                params: {
+                    "booked_place_form": JSON.stringify(this.renew_booked_place_form)
+                }
+            }).then((response) => {
+                this.renew_booked_place_form["price"] = response.data["price"]
+            })
+        },
         submit_add_booked_place_form() {
             swal({
               title: "Подтвердите ваше действия. Вы точно хотите добавить забронированное место?",
@@ -380,7 +412,10 @@ const main_section_app = Vue.createApp({
                         "duration": 1,
                         "term": "hours",
                         "type": this.place_types[0],
-                        "deposit": 0
+                        "deposit": 0,
+                        "discount": 0,
+                        "price": 0,
+                        "window": 0
                     }
                 }).catch((error) => {
                     if (error.response) {
@@ -451,7 +486,8 @@ const main_section_app = Vue.createApp({
                                 "term": "hours",
                                 "place_type": this.place_types[0],
                                 "used_discount": 0,
-                                "price": 0
+                                "price": 0,
+                                "window": 0
                             }
                         }).catch((error) => {
                             if (error.response) {
@@ -468,8 +504,19 @@ const main_section_app = Vue.createApp({
                 })
             }
         },
-        update_resident_visited_today_status(resident_id) {
-            axios.post("/resident/update_resident_visited_today_status/", {"resident_id": resident_id}, {headers: {
+        update_resident_visited_today_status(resident) {
+            if (resident.visited_today) {
+                resident.visited_times++
+            }
+            else {
+                resident.visited_times--
+
+                if (resident.visited_times < 0) {
+                    resident.visited_times = 0
+                }
+            }
+
+            axios.post("/resident/update_resident_visited_today_status/", {"resident_id": resident.id}, {headers: {
                         "X-CSRFToken": $cookies.get("csrftoken"),
                     }})
         },
@@ -628,7 +675,8 @@ const main_section_app = Vue.createApp({
                 price: 0,
                 used_discount: 0,
                 payment_type: "cashless",
-                submit_function: "calculate_price"
+                submit_function: "calculate_price",
+                window: 0
             }
         },
         submit_renew_resident_form() {
@@ -688,7 +736,12 @@ const main_section_app = Vue.createApp({
                 booked_place_id: booked_place.id,
                 duration: 1,
                 term: "hours",
-                time_type: "daytime"
+                time_type: "daytime",
+                discount: 0,
+                price: 0,
+                type: booked_place.type,
+                deposit: 0,
+                window: 0
             }
         },
         submit_renew_booked_place_form() {
@@ -744,6 +797,9 @@ const main_section_app = Vue.createApp({
             this.add_resident_form["duration"] = booked_place.duration
             this.add_resident_form["term"] = booked_place.term
             this.add_resident_form["time_type"] = booked_place.time_type
+            this.add_resident_form["used_discount"] = booked_place.discount
+            this.add_resident_form["window"] = booked_place.window
+            this.add_resident_form["price"] = booked_place.price - booked_place.deposit
             this.add_resident_form["starts_at"] = moment(booked_place.starts_at, "DD.MM.YYYY, HH:mm").format("yyyy-MM-DDTHH:mm")
             this.add_resident_form["submit_function"] = "calculate_price"
         },
@@ -894,12 +950,16 @@ const main_section_app = Vue.createApp({
                 this.add_resident_form["place_type"] = order["place_type"]
                 this.add_resident_form["used_discount"] = order["used_discount"]
                 this.add_resident_form["price"] = 0
+                this.add_resident_form["window"] = order["window"]
 
                 this.add_booked_place_form["consumer_fullname"] = order["fullname"]
                 this.add_booked_place_form["consumer_phone_number"] = order["phone_number"]
                 this.add_booked_place_form["number"] = order["place_number"]
                 this.add_booked_place_form["type"] = order["place_type"]
                 this.add_booked_place_form["deposit"] = 0
+                this.add_booked_place_form["discount"] = 0
+                this.add_booked_place_form["price"] = 0
+                this.add_booked_place_form["window"] = order["window"]
 
                 this.open_add_form()
             } else {
@@ -909,6 +969,7 @@ const main_section_app = Vue.createApp({
                 this.add_resident_form["submit_function"] = "calculate_price"
                 this.add_resident_form["place_number"] = order["number"]
                 this.add_resident_form["place_type"] = order["type"]
+                this.add_resident_form["window"] = order["window"]
                 this.add_resident_form["used_discount"] = 0
                 this.add_resident_form["price"] = 0
 
@@ -917,6 +978,9 @@ const main_section_app = Vue.createApp({
                 this.add_booked_place_form["number"] = order["number"]
                 this.add_booked_place_form["type"] = order["type"]
                 this.add_booked_place_form["deposit"] = order["deposit"]
+                this.add_booked_place_form["discount"] = order["discount"]
+                this.add_booked_place_form["window"] = order["window"]
+                this.add_booked_place_form["price"] = 0
 
                 this.open_add_form()
                 this.which_one_add = "booked_place"

@@ -120,7 +120,7 @@ def add_resident(resident_info: Mapping) -> Tuple[Success, StatusCode, Message]:
                 return False, 409, "Place is not free at given datetime"
 
         resident = form.save(commit=False)
-        resident.expires_at = booking_expires_at
+        resident.expires_at = booking_expires_at + relativedelta(minutes=form.cleaned_data["window"])
         resident.price = _calculate_price(form.cleaned_data["place_type"],
                                           form.cleaned_data["time_type"],
                                           form.cleaned_data["duration"],
@@ -160,10 +160,6 @@ def renew_resident(resident_info: Mapping) -> Tuple[Success, StatusCode, Message
                                                               resident_id=resident.id):
                 return False, 409, "Place is not free at given datetime"
 
-        resident.status = "deleted"
-        resident.deleted_at = datetime_now()
-        resident.save(update_fields=["status", "deleted_at"])
-
         resident_dict = resident.__dict__
         del resident_dict["_state"], resident_dict["id"]
 
@@ -173,12 +169,13 @@ def renew_resident(resident_info: Mapping) -> Tuple[Success, StatusCode, Message
         new_resident.status = "active"
         new_resident.deleted_at = None
         new_resident.starts_at = resident.expires_at
-        new_resident.expires_at = booking_expires_at
+        new_resident.expires_at = booking_expires_at + relativedelta(minutes=form.cleaned_data["window"])
         new_resident.duration = form.cleaned_data["duration"]
         new_resident.term = form.cleaned_data["term"]
         new_resident.time_type = form.cleaned_data["time_type"]
         new_resident.used_discount = form.cleaned_data["used_discount"]
         new_resident.payment_type = form.cleaned_data["payment_type"]
+        new_resident.window = form.cleaned_data["window"]
         new_resident.price = _calculate_price(resident.place_type, form.cleaned_data["time_type"],
                                               form.cleaned_data["duration"], form.cleaned_data["term"],
                                               form.cleaned_data["used_discount"])
@@ -213,10 +210,20 @@ def update_resident_info(resident_id: int, field_for_updating: str, new_value: T
 
 
 def update_resident_visited_today_status(resident_id: int) -> None:
+    resident = Resident.objects.filter(id=resident_id).first()
     resident_visited_day, created = ResidentVisitedDay.objects.get_or_create(resident_id=resident_id,
                                                                              date=datetime_now().date())
     if not created:
         resident_visited_day.delete()
+        resident.visited_times -= 1
+
+        if resident.visited_times < 0:
+            resident.visited_times = 0
+
+        resident.save(update_fields=["visited_times"])
+    else:
+        resident.visited_times += 1
+        resident.save(update_fields=["visited_times"])
 
 
 def get_attendance_of_resident(resident_id: int) -> Mapping:

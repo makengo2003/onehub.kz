@@ -16,4 +16,4 @@ class RenewResidentForm(forms.ModelForm):
 
     class Meta:
         model = Resident
-        fields = ("payment_type", "duration", "term", "time_type", "used_discount")
+        fields = ("payment_type", "duration", "term", "time_type", "used_discount", "window")

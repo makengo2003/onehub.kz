@@ -180,12 +180,23 @@
                         </div>
                     </div>
 
-                    <div class="FIO">
-                        <p>ФИО</p>
+                    <div style="display: flex">
+                        <div class="FIO">
+                            <p>ФИО</p>
 
-                        <div class="FIO_input">
-                            <input style="margin-bottom: 5px;" required type="text" v-model="add_booked_place_form.consumer_fullname">
-                            <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="booking_search_by_fullname">Поиск по имени</h5>
+                            <div class="FIO_input">
+                                <input style="margin-bottom: 5px;" required type="text" v-model="add_booked_place_form.consumer_fullname">
+                                <h5 style="margin: 0 0 10px 0px; color: blue; cursor: pointer;" @click="booking_search_by_fullname">Поиск по имени</h5>
+                            </div>
+                        </div>
+
+
+                        <div class="consumers_activity" style="margin-left: 39px;">
+                            <p style="font-size: 17px; margin-left: -25px;">Скидка</p>
+
+                            <div class="consumers_activity_input">
+                              <input type="number" style="width: 120px; margin-top: 3px" required v-model="add_booked_place_form.discount">
+                            </div>
                         </div>
                     </div>
 
@@ -248,6 +259,14 @@
                             <input type="number" v-model="add_booked_place_form.deposit" required style="width: 116px;">
                         </div>
                     </div>
+
+                    <div class="deposit">
+                        <p>Окошка (минут)</p>
+
+                        <input type="number" v-model="add_booked_place_form.window" required style="width: 116px;">
+                    </div>
+
+                    <p>Счет к оплате: ${ add_booked_place_form.price } <a href="" @click="calculate_booking_price($event)">Посчитать счет</a></p>
 
                     <div class="add_btn">
                         <button type="submit">Добавить</button>
@@ -358,6 +377,12 @@
                         </div>
                     </div>
 
+                    <div class="deposit">
+                        <p>Окошка (минут)</p>
+
+                        <input type="number" v-model="add_resident_form.window" required style="width: 116px;">
+                    </div>
+
                     <p>Счет к оплате: ${ add_resident_form.price }</p>
 
                     <div class="add_btn">
@@ -394,6 +419,13 @@
                         Локер
                         <span style="font-size: 17px" v-if="residents_order_by_column == 'locker'"><b>↑</b></span>
                         <span style="font-size: 17px" v-else-if="residents_order_by_column == '-locker'"><b>↓</b></span>
+                    </p>
+                </div>
+                <div class="place" style="min-width: 140px;">
+                    <p @click="residents_order_by('visited_times')">
+                        Кол. посещении
+                        <span style="font-size: 17px" v-if="residents_order_by_column == 'visited_times'"><b>↑</b></span>
+                        <span style="font-size: 17px" v-else-if="residents_order_by_column == '-visited_times'"><b>↓</b></span>
                     </p>
                 </div>
                 <div class="placeType">
@@ -434,6 +466,9 @@
                         <div class="place">
                             <p>${ resident.locker }</p>
                         </div>
+                        <div class="place" style="min-width: 140px;">
+                            <p>${ resident.visited_times }</p>
+                        </div>
                         <div class="placeType">
                             <p>${ resident.place_type }</p>
                         </div>
@@ -442,7 +477,7 @@
                             <p v-else style="color: red">${ resident.starts_at } --- ${ resident.expires_at }</p>
                         </div>
                         <div class="visited_today">
-                            <input style="cursor: pointer;" type="checkbox" class="visited_today_checkbox" v-model="resident.visited_today" @change="update_resident_visited_today_status(resident.id)">
+                            <input style="cursor: pointer;" type="checkbox" class="visited_today_checkbox" v-model="resident.visited_today" @change="update_resident_visited_today_status(resident)">
                         </div>
                         <div class="time_type">
 
@@ -531,6 +566,10 @@
                       <b>Время дня:</b>
                       <span>${ current_opened_resident.time_type_text() }</span>
                     </div>
+                    <div class="side_info">
+                      <b>Окошка (минут):</b>
+                      <span>${ current_opened_resident.window }</span>
+                    </div>
                     <div class="side_btns">
                       <button class="extend" @click="open_renew_resident_form(current_opened_resident)">Продлить</button>
                       <button class="delete" @click="delete_resident(current_opened_resident)">Удалить</button>
@@ -600,7 +639,12 @@
                             </select>
                         </div>
                     </div>
-                    
+
+                    <div class="duration">
+                        <p style="font-size: 18px">Окошка (минут)</p>
+
+                        <input style="width: 115px" required type="number" v-model="renew_resident_form.window">
+                    </div>
 
                     <div class="price">
                         <p style="margin-bottom: 15px;">Счет к оплате: ${ renew_resident_form.price } тг</p>
@@ -724,6 +768,10 @@
                       <b>Время дня:</b>
                       <span>${ current_opened_deleted_resident.time_type_text() }</span>
                     </div>
+                    <div class="side_info">
+                      <b>Окошка (минут):</b>
+                      <span>${ current_opened_deleted_resident.window }</span>
+                    </div>
                     <div class="side_btns">
                       <button class="extend" @click="repeat_order(current_opened_deleted_resident)">Повторить заказ</button>
                     </div>
@@ -830,6 +878,18 @@
                     <div class="side_info">
                       <b>Время дня:</b>
                       <span>${ current_opened_deleted_booked_place.time_type_text() }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Скидка:</b>
+                      <span>${ current_opened_deleted_booked_place.discount }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Цена:</b>
+                      <span>${ current_opened_deleted_booked_place.price }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Окошка (минут):</b>
+                      <span>${ current_opened_deleted_booked_place.window }</span>
                     </div>
                     <div class="side_btns">
                       <button class="extend" @click="repeat_order(current_opened_deleted_booked_place)">Повторить заказ</button>
@@ -971,6 +1031,18 @@
                       <b>Время дня:</b>
                       <span>${ current_opened_booked_place.time_type_text() }</span>
                     </div>
+                    <div class="side_info">
+                      <b>Скидка:</b>
+                      <span>${ current_opened_booked_place.discount }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Цена:</b>
+                      <span>${ current_opened_booked_place.price }</span>
+                    </div>
+                    <div class="side_info">
+                      <b>Окошка (минут):</b>
+                      <span>${ current_opened_booked_place.window }</span>
+                    </div>
                     <div class="side_btns">
                         <button class="extend" @click="from_booked_place_to_resident(current_opened_booked_place)">Сделать резидентом</button>
                     </div>
@@ -986,7 +1058,7 @@
 
             <form id="renew_booked_place-zatemnenie" @submit.prevent="submit_renew_booked_place_form">
                 {% csrf_token %}
-                <div class="extend_block">
+                <div class="extend_block" style="width: 550px;">
                     <div class="place_info">
                         <div class="duration">
                             <p style="font-size: 18px">Длительность</p>
@@ -1012,7 +1084,21 @@
                                 <option value="day">Сутки</option>
                             </select>
                         </div>
+
+                        <div class="duration" style="margin-left: 25px;">
+                            <p style="font-size: 18px">Скидка</p>
+
+                            <input style="width: 115px" required type="number" v-model="renew_booked_place_form.discount">
+                        </div>
+
+                        <div class="duration">
+                            <p style="font-size: 18px">Окошка (минут)</p>
+
+                            <input style="width: 115px" required type="number" v-model="renew_booked_place_form.window">
+                        </div>
                     </div>
+
+                    <p>Счет к оплате: ${ renew_booked_place_form.price } <a href="" @click="calculate_renewing_booked_place_price($event)">Посчитать счет</a></p>
 
                     <div class="add_btn">
                         <button type="submit">Продлить</button>

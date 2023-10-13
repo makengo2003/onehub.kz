@@ -7,7 +7,7 @@ class AddBookedPlaceForm(forms.ModelForm):
 
     class Meta:
         model = BookedPlace
-        exclude = ("expires_at", "deleted_at", "status")
+        exclude = ("expires_at", "deleted_at", "status", "price")
 
 
 class RenewBookedPlaceForm(forms.ModelForm):
@@ -15,4 +15,4 @@ class RenewBookedPlaceForm(forms.ModelForm):
 
     class Meta:
         model = BookedPlace
-        fields = ("duration", "term", "time_type")
+        fields = ("duration", "term", "time_type", "discount", "window")

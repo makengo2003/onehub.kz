@@ -12,4 +12,6 @@ urlpatterns = [
     path("update_booked_place_info/", update_booked_place_info_view, name="update_booked_place_info"),
     path("search_by_fullname/", search_by_fullname_view, name="search_by_fullname"),
     path("search_by_phone_number/", search_by_phone_number_view, name="search_by_phone_number"),
+
+    path("calculate_price/", calculate_price_view, name="calculate_price")
 ]

@@ -1,3 +1,4 @@
+import json
 from typing import Mapping, Tuple, TypeVar, Optional
 from datetime import datetime
 from typing_extensions import TypeAlias
@@ -12,6 +13,7 @@ from django.db.models import Q
 from resident.models import Resident
 from booking.forms import AddBookedPlaceForm, RenewBookedPlaceForm
 from booking.models import BookingRequest, BookedPlace, AcceptedBookingRequest
+from site_settings.models import PlaceTypePrice
 
 T = TypeVar("T")
 Success: TypeAlias = bool
@@ -106,7 +108,8 @@ def add_booked_place(booked_place_info: Mapping) -> Tuple[Success, StatusCode, M
                 return False, 409, "Place is not free at given datetime"
 
         booked_place = form.save(commit=False)
-        booked_place.expires_at = booking_expires_at
+        booked_place.expires_at = booking_expires_at + relativedelta(minutes=form.cleaned_data["window"])
+        booked_place.price = _calculate_price(form.cleaned_data["type"], form.cleaned_data["time_type"], int(form.cleaned_data["duration"]), form.cleaned_data["term"], int(form.cleaned_data["discount"]))
         booked_place.save()
 
         request_user = getattr(settings, 'request_user', None)
@@ -142,10 +145,6 @@ def renew_booked_place(booked_place_info: Mapping) -> Tuple[Success, StatusCode,
                                              booked_place_id=form.cleaned_data["booked_place_id"]):
                 return False, 409, "Place is not free at given datetime"
 
-        booked_place.status = "deleted"
-        booked_place.deleted_at = datetime_now()
-        booked_place.save(update_fields=["status", "deleted_at"])
-
         booked_place_dict = booked_place.__dict__
         del booked_place_dict["_state"], booked_place_dict["id"]
 
@@ -155,15 +154,19 @@ def renew_booked_place(booked_place_info: Mapping) -> Tuple[Success, StatusCode,
         new_booked_place.status = "active"
         new_booked_place.deleted_at = None
         new_booked_place.starts_at = booked_place.expires_at
-        new_booked_place.expires_at = booking_expires_at
+        new_booked_place.expires_at = booking_expires_at + relativedelta(minutes=form.cleaned_data["window"])
         new_booked_place.duration = form.cleaned_data["duration"]
         new_booked_place.term = form.cleaned_data["term"]
         new_booked_place.time_type = form.cleaned_data["time_type"]
+        new_booked_place.discount = form.cleaned_data["discount"]
+        new_booked_place.window = form.cleaned_data["window"]
+        new_booked_place.deposit = 0
+        new_booked_place.price = _calculate_price(new_booked_place.type, form.cleaned_data["time_type"], int(form.cleaned_data["duration"]), form.cleaned_data["term"], int(form.cleaned_data["discount"]))
         new_booked_place.save()
 
         request_user = getattr(settings, 'request_user', None)
         AdminAction.objects.create(admin_fullname=request_user.username,
-                                   title=f"Продлил(а) забронированного место для {new_booked_place.consumer_fullname} "
+                                   title=f"Продлил(а) забронированного место {new_booked_place.type} для {new_booked_place.consumer_fullname} "
                                          f"({new_booked_place.starts_at.strftime('%d.%m.%Y, %H:%M')} --- {new_booked_place.expires_at.strftime('%d.%m.%Y, %H:%M')})")
 
         return True, 200, "OK"
@@ -179,7 +182,7 @@ def delete_booked_place(booked_place_id: int) -> None:
 
     request_user = getattr(settings, 'request_user', None)
     AdminAction.objects.create(admin_fullname=request_user.username,
-                               title=f"Удалил(а) забронированного место {booked_place.consumer_fullname} "
+                               title=f"Удалил(а) забронированное место {booked_place.type} {booked_place.consumer_fullname} "
                                      f"({booked_place.starts_at.strftime('%d.%m.%Y, %H:%M')} --- {booked_place.expires_at.strftime('%d.%m.%Y, %H:%M')})")
 
 
@@ -190,6 +193,11 @@ def update_booked_place_info(booked_place_id: int, field_for_updating: str, new_
         update_fields["deleted_at"] = datetime_now()
 
     BookedPlace.objects.filter(id=booked_place_id).update(**update_fields)
+
+    booked_place = BookedPlace.objects.filter(id=booked_place_id).first()
+    AdminAction.objects.create(admin_fullname="Система",
+                               title=f"Удалил(а) забронированное место {booked_place.type} {booked_place.consumer_fullname} "
+                                     f"({booked_place.starts_at.strftime('%d.%m.%Y, %H:%M')} --- {booked_place.expires_at.strftime('%d.%m.%Y, %H:%M')})")
 
 
 def search_by_fullname(fullname):
@@ -204,3 +212,23 @@ def search_by_phone_number(phone_number):
     if booked_place:
         return booked_place.consumer_fullname
     return ""
+
+
+def calculate_price(data) -> int:
+    data = json.loads(data)
+    return _calculate_price(data["type"], data["time_type"], int(data["duration"]), data["term"], int(data["discount"]))
+
+
+def _calculate_price(place_type: str, time_type: str, duration: int, term: str, discount: int) -> int:
+    place_type_price = PlaceTypePrice.objects.filter(Q(time_type=time_type) | Q(time_type="anytime"),
+                                                     place_type__name=place_type, duration=duration,
+                                                     term=term).only("price")
+    if not place_type_price:
+        place_type_price = PlaceTypePrice.objects.filter(Q(time_type=time_type) | Q(time_type="anytime"),
+                                                         place_type__name=place_type, duration=1,
+                                                         term=term).only("price")[0]
+        price = duration * place_type_price.price
+    else:
+        price = place_type_price[0].price
+
+    return price - (price * (discount / 100.0))

@@ -21,6 +21,9 @@ class BookedPlace(models.Model):
     duration = models.PositiveIntegerField()
     term = models.CharField(max_length=50, choices=settings.PLACE_BOOKING_TERMS)
     time_type = models.CharField(max_length=50, choices=settings.TIME_TYPES)
+    discount = models.PositiveIntegerField(null=True, blank=True, default=0)
+    price = models.PositiveIntegerField(default=0)
+    window = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.pk}. {self.consumer_fullname} [{str(self.status).upper()}]. {self.created_at}"

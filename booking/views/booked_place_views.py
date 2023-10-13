@@ -46,3 +46,9 @@ def search_by_phone_number_view(request):
     phone_number = request.query_params.get("phone_number")
     fullname = booking_services.search_by_phone_number(phone_number)
     return Response({"fullname": fullname})
+
+
+@api_view(["GET"])
+def calculate_price_view(request):
+    price = booking_services.calculate_price(request.query_params["booked_place_form"])
+    return Response({"price": price})
