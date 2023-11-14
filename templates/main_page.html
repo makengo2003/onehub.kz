@@ -45,7 +45,7 @@
            <ul class="menu__box">
             <!-- <li><a class="menu__item" onclick="open_prices()" style="cursor: pointer;">Прайс</a></li> -->
             <li><a class="menu__item" onclick="window.location.hash = 'booking_form'">Бронирование</a></li>
-            <li><a class="menu__item" href="dogovor-oferta/">Договор - оферта</a></li>
+            <li><a class="menu__item" href="{% static 'dogovor-oferta.docx' %}">Договор - оферта</a></li>
             <li><a style="color: blue" class="menu__item" href="#login_form">Войти</a></li>
           </ul>
         </div>
@@ -65,7 +65,7 @@
             <a onclick="window.location.hash = 'booking_form'">Бронирование</a>
           </div>
           <div class="nav_link">
-            <a href="dogovor-oferta/">Договор - оферта</a>
+            <a href="{% static 'dogovor-oferta.docx' %}">Договор - оферта</a>
           </div>
         </div>
       </div>
@@ -259,7 +259,7 @@
               </div>
 
               <div class="footer_link">
-                <a href="dogovor-oferta/">Договор-офферта</a>
+                <a href="{% static 'dogovor-oferta.docx' %}">Договор-офферта</a>
               </div>
             </div>
 
